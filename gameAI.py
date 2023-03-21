@@ -253,7 +253,7 @@ class gameAI:
                     tested_orders += 1
                     order_list = list(order)
                     out_of_place = 0
-                    if 'G7' in [card.card_id for card in order_list]:
+                    if 'G7' in [card.card_id for card in order_list] and open_spot_count>2:
                         out_of_place_limit = 2
                     else:
                         out_of_place_limit = 1
@@ -298,7 +298,7 @@ class gameAI:
                                 test_grid[i][j] = order_distributor.pop(0)
                     if out_of_place == out_of_place_limit or pluses < pluses_floor:
                         continue
-                    if out_of_place_limit == 2 and 'G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]:
+                    if out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y)):
                         continue
 
                     valid_orders += 1
