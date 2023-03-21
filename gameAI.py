@@ -386,6 +386,7 @@ class gameAI:
                     test_setup.max_unknown = self.max_unknown
                     test_setup.possible_bonus_cards = self.possible_opp_bonus_cards.copy()
                     self.last_plan, _ = grid_deep_copy(test_grid)
+                    self.flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
 
                     if self.player_num == 0:
                         test_setup.p_zero_grid, _ = grid_deep_copy(player_grid)
