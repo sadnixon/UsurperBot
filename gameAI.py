@@ -775,7 +775,7 @@ class gameAI:
                 return decision, move_x, move_y, target_x, target_y
 
     def pre_score_decision(self, setup, pre_score_id, i, j, test=False):
-        if self.player_num == 0:
+        if setup.turn==0:
             player_bonus = setup.p_zero_bonus
             player_grid = setup.p_zero_grid
             opponent_grid = setup.p_one_grid
