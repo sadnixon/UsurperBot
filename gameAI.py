@@ -675,9 +675,17 @@ class gameAI:
             self.new_plan = True
             if self.mode == 'full':
                 # TODO UPDATE WITH DRAFTING WEIGHTS
-                return random.choice(range(4))
+                for i in range(4):
+                    card_selection_x = random.choice(range(4))
+                    if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                        return card_selection_x
+                return card_selection_x
             elif self.mode == 'random':
-                return random.choice(range(4))
+                for i in range(4):
+                    card_selection_x = random.choice(range(4))
+                    if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                        return card_selection_x
+                return card_selection_x
         elif instant_id == 'Y8':
             if self.mode == 'full':
                 if not test:
@@ -731,12 +739,21 @@ class gameAI:
                     return card_selection_x
                 else:
                     # TODO UPDATE WITH DRAFTING WEIGHTS
-                    return random.choice(range(3))
+                    for i in range(3):
+                        card_selection_x = random.choice(range(3))
+                        if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                            return card_selection_x
+                    return card_selection_x
+                        
             elif self.mode == 'random':
                 if len(setup.draft_options) == 0:
                     return random.choice(range(len(player_hand)))
                 else:
-                    return random.choice(range(3))
+                    for i in range(3):
+                        card_selection_x = random.choice(range(3))
+                        if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                            return card_selection_x
+                    return card_selection_x
         elif instant_id == 'G7':
             if self.mode == 'full':
                 return self.g7_plan['decision'], self.g7_plan['move_x'], self.g7_plan['move_y'], self.g7_plan['target_x'], self.g7_plan['target_y']

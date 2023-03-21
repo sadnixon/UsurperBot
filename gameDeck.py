@@ -224,10 +224,12 @@ B11 = gameCard("Ponytail Blacksmith", "B11", 2, "B", 1, 0, 1,
 
 class gameDeck:
     def __init__(self):
-        self.deck = [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11,
+        
+        all_cards = [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11,
                      Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8, Y9, Y10, Y11,
                      G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11,
                      B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11]
+        self.deck = [card.__copy__() for card in all_cards]
 
     def __str__(self):
         deckStr = ""

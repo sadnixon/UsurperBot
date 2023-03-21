@@ -664,7 +664,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                         if player_ai.instant_decision(setup,instant_id,i,j,test=test) == 'y':
                             setup.flip_card(player, i, j)
     elif instant_id == 'G4':
-        if (pos_x, pos_y) not in [(0,2),(2,0)]:
+        if (pos_x, pos_y) not in [(0,2),(2,0)] or len(player_hand) == 0:
             return
         if not test:
             print(f"{player_name}, select a card to discard")

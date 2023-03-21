@@ -161,17 +161,6 @@ class usurperGame:
             print(f"{self.p_one_name} WINS!")
         else:
             print("IT'S A PERFECT TIE!")
-
-        for i in range(3):
-            for j in range(3):
-                if self.setup.p_zero_grid[i][j] != 0:
-                    self.setup.un_copy_card(0,i,j)
-                    if self.setup.p_zero_grid[i][j].flipped:
-                        self.setup.flip_card(0,i,j)
-                if self.setup.p_one_grid[i][j] != 0:
-                    self.setup.un_copy_card(1,i,j)
-                    if self.setup.p_one_grid[i][j].flipped:
-                        self.setup.flip_card(1,i,j)
         
         return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
 
