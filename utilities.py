@@ -138,9 +138,9 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
                 if current_id == 'Y1':
                     pass
                 elif current_id == 'Y2':
-                    flat_grid = [(item.og_base_points == 1 and not item.flipped)
+                    flat_grid = [(item.base_points == 1 and not item.flipped)
                                  * 3 for sublist in player_grid for item in sublist]
-                    flat_opponent_grid = [(item.og_base_points == 1 and not item.flipped)
+                    flat_opponent_grid = [(item.base_points == 1 and not item.flipped)
                                           * 3 for sublist in opponent_grid for item in sublist]
                     one_sum = sum(flat_grid)+sum(flat_opponent_grid) + extra_one + d_extra_one
                     current_card.changepoints(one_sum)
@@ -270,7 +270,7 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
                         current_card.changepoints(8-current_card.points)
                 elif current_id == 'B8':
                     if current_card.placement_grid[i][j] == 2:
-                        flat_grid = [(item.og_base_points == 1 and not item.flipped)
+                        flat_grid = [(item.base_points == 1 and not item.flipped)
                                      * 1 for sublist in player_grid for item in sublist]
                         one_sum = sum(flat_grid) + d_extra_one
                         current_card.changepoints(one_sum)
@@ -477,8 +477,11 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 replacement_x = int(input())
                 replacement_y = int(input())
         else:
-            replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id)
+            replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(player, replacement_x, replacement_y)
+
+        if player_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
         player_ai.deck_to_board(player_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(player_grid[replacement_x][replacement_y])
@@ -499,8 +502,11 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 replacement_x = int(input())
                 replacement_y = int(input())
         else:
-            replacement_x, replacement_y = opp_ai.instant_decision(setup, instant_id)
+            replacement_x, replacement_y = opp_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(opponent, replacement_x, replacement_y)
+
+        if opponent_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, opponent, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
         player_ai.deck_to_board(opponent_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(opponent_grid[replacement_x][replacement_y])
@@ -527,7 +533,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 flip_x = int(input())
                 flip_y = int(input())
         else:
-            decision, flip_x, flip_y = player_ai.instant_decision(setup, instant_id)
+            decision, flip_x, flip_y = player_ai.instant_decision(setup, instant_id,test=test)
             if decision == 'n':
                 return
         setup.flip_card(player, flip_x, flip_y)
@@ -555,10 +561,13 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 replacement_x = int(input())
                 replacement_y = int(input())
         else:
-            decision, replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id)
+            decision, replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id,test=test)
             if decision == 'n':
                 return
         setup.replace(player, replacement_x, replacement_y)
+
+        if player_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
         player_ai.deck_to_board(player_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(player_grid[replacement_x][replacement_y])
@@ -583,7 +592,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 flip_x = int(input())
                 flip_y = int(input())
         else:
-            flip_x, flip_y = player_ai.instant_decision(setup, instant_id)
+            flip_x, flip_y = player_ai.instant_decision(setup, instant_id,test=test)
         setup.flip_card(opponent, flip_x, flip_y)
         opp_ai.new_plan = True
     elif instant_id == 'R9':
@@ -605,7 +614,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 print("Input valid index from 0 to 3")
                 selection_x = int(input())
         else:
-            selection_x = player_ai.instant_decision(setup, instant_id)
+            selection_x = player_ai.instant_decision(setup, instant_id,test=test)
         setup.draft_temp(selection_x, player)
         opp_ai.opp_draw_card()
         for i in range(3):
@@ -616,9 +625,9 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print("All cards of base power (4) or more have been flipped!")
         for i in range(3):
             for j in range(3):
-                if player_grid[i][j] != 0 and player_grid[i][j].og_base_points > 3 and not player_grid[i][j].flipped:
+                if player_grid[i][j] != 0 and player_grid[i][j].base_points > 3 and not player_grid[i][j].flipped:
                     setup.flip_card(player, i, j)
-                if opponent_grid[i][j] != 0 and opponent_grid[i][j].og_base_points > 3 and not opponent_grid[i][j].flipped:
+                if opponent_grid[i][j] != 0 and opponent_grid[i][j].base_points > 3 and not opponent_grid[i][j].flipped:
                     setup.flip_card(opponent, i, j)
         player_ai.new_plan = True
         opp_ai.new_plan = True
@@ -648,7 +657,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                         if decision == 'y':
                             setup.flip_card(player, i, j)
                     else:
-                        if player_ai.instant_decision(setup,instant_id,i,j) == 'y':
+                        if player_ai.instant_decision(setup,instant_id,i,j,test=test) == 'y':
                             setup.flip_card(player, i, j)
     elif instant_id == 'G4':
         if (pos_x, pos_y) not in [(0,2),(2,0)]:
@@ -662,7 +671,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 print(f"Input valid index from 0 to {len(player_hand)-1}")
                 selection_x = int(input())
         else:
-            selection_x = player_ai.instant_decision(setup,instant_id)
+            selection_x = player_ai.instant_decision(setup,instant_id,test=test)
         setup.discard(player, 'hand', selection_x, 0)
         opp_ai.opp_discard(setup.discard_pile[-1],True)
         for i in range(3):
@@ -678,7 +687,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 print("Input valid index from 0 to 2")
                 selection_x = int(input())
         else:
-            selection_x = player_ai.instant_decision(setup,instant_id)
+            selection_x = player_ai.instant_decision(setup,instant_id,test=test)
         setup.draft_temp(selection_x, player)
         opp_ai.opp_draw_card()
         for i in range(2):
@@ -714,7 +723,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 target_x = int(input())
                 target_y = int(input())
         else:
-            decision, move_x, move_y, target_x, target_y = player_ai.instant_decision(setup,instant_id)
+            decision, move_x, move_y, target_x, target_y = player_ai.instant_decision(setup,instant_id,test=test)
             if decision == 'n':
                 return
         setup.move_card(player, move_x, move_y, target_x, target_y)
@@ -753,7 +762,7 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
                         print(f"{name}, do you want to flip {player_grid[i][j].name} y/n")
                         decision = input()
                 else:
-                    decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j)
+                    decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j,test=test)
                 if decision == 'y':
                     setup.flip_card(setup.turn, i, j)
             elif player_grid[i][j].card_id == 'G6' and i < 2 and player_grid[i+1][j].card_id != 'N0':
@@ -772,7 +781,7 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
                             f"{name}, do you want to flip {player_grid[i+1][j].name} y/n")
                         decision = input()
                 else:
-                    decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j)
+                    decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j,test=test)
                 if decision == 'y':
                     setup.flip_card(setup.turn, i+1, j)
             elif player_grid[i][j].card_id == 'G11':
@@ -796,7 +805,7 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
                     f"{name}, do you want Bear Bear to copy {player_grid[g3_coords[0]][g3_coords[1]+1].name} y/n")
                 decision = input()
         else:
-            decision = player_ai.pre_score_decision(setup,player_grid[g3_coords[0]][g3_coords[1]].card_id,g3_coords[0],g3_coords[1])
+            decision = player_ai.pre_score_decision(setup,player_grid[g3_coords[0]][g3_coords[1]].card_id,g3_coords[0],g3_coords[1],test=test)
         if decision == 'y':
             setup.copy_card(setup.turn, g3_coords[0], g3_coords[1])
             if player_grid[g3_coords[0]][g3_coords[1]+1].card_id in ['G5','G6','G11']:

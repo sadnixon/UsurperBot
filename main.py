@@ -20,7 +20,7 @@ class usurperGame:
         self.p_zero_type = p_zero_type
         self.p_one_type = p_one_type
         self.setup = gameSetup(p_zero_bonus_id,p_one_bonus_id)
-        self.p_ai = [gameAI(p_zero_ai_level, 0), gameAI(p_one_ai_level, 1)]
+        self.p_ai = [gameAI(0, p_zero_ai_level), gameAI(1, p_one_ai_level)]
 
     def mainLoop(self):
         print("Begin draft phase.")
@@ -176,5 +176,5 @@ class usurperGame:
         return p_zero_score, p_one_score, p_zero_draft, p_one_draft
 
 
-#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full')
-#game.mainLoop()
+game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full')
+game.mainLoop()
