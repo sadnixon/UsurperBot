@@ -216,13 +216,15 @@ for i in range(x):
         CRI_list.append(pd.read_csv('./cross_references_instances/cross_references_X'+str(l+1)+'_instances.csv').set_index('Unnamed: 0'))
         CR_list_opp.append(pd.read_csv('./cross_references_opp/cross_references_X'+str(l+1)+'_opp.csv').set_index('Unnamed: 0'))
         CRI_list_opp.append(pd.read_csv('./cross_references_instances_opp/cross_references_X'+str(l+1)+'_instances_opp.csv').set_index('Unnamed: 0'))
+    PR = pd.read_csv('./point_references/point_references.csv').set_index('Unnamed: 0')
+    PRI = pd.read_csv('./point_references/point_references_instances.csv').set_index('Unnamed: 0')
     print('STARTING ROUND '+str(i))
     for combo in itertools.combinations(bonus_id_list, 2):
         
         combo_list = list(combo)
         print('STARTING GAME IN ROUND '+str(i))
         game = usurperGame("UsurperBot1", "UsurperBot2", 'AI','AI', 'full', 'full', combo_list[0], combo_list[1])
-        p_zero_score, p_one_score, p_zero_draft, p_one_draft = game.mainLoop()
+        p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, p_zero_grid, p_one_grid, p_zero_bonus_score, p_one_bonus_score = game.mainLoop()
         print('ENDING GAME IN ROUND '+str(i))
 
         for j in range(9):
@@ -235,6 +237,12 @@ for i in range(x):
                 combo_list[1])][p_one_draft[j]][p_one_draft[j]] += p_one_score-p_zero_score
             CRI_list[bonus_id_list.index(
                 combo_list[1])][p_one_draft[j]][p_one_draft[j]] += 1
+            
+            PR[p_zero_grid[j//3][j%3].card_id][combo_list[0]] += p_zero_indivs[j]
+            PRI[p_zero_grid[j//3][j%3].card_id][combo_list[0]] += 1
+
+            PR[p_one_grid[j//3][j%3].card_id][combo_list[1]] += p_one_indivs[j]
+            PRI[p_one_grid[j//3][j%3].card_id][combo_list[1]] += 1
 
             for k in range(9):
                 if k >= j+1:
@@ -265,8 +273,8 @@ for i in range(x):
                     combo_list[1])][p_one_draft[j]][p_zero_draft[k]] += p_one_score-p_zero_score
                 CRI_list_opp[bonus_id_list.index(
                     combo_list[1])][p_one_draft[j]][p_zero_draft[k]] += 1
-        
-        print(dir())
+                
+
 
 
     for m in range(10):
@@ -279,3 +287,7 @@ for i in range(x):
         CR_avg_opp = CR_list_opp[m].div(CRI_list_opp[m])
         CR_avg.to_csv('./cross_references_averages/cross_references_X'+str(m+1)+'_avg.csv')
         CR_avg_opp.to_csv('./cross_references_averages_opp/cross_references_X'+str(m+1)+'_avg_opp.csv')
+    PR.to_csv('./point_references/point_references.csv')
+    PRI.to_csv('./point_references/point_references_instances.csv')
+    PR_avg = PR.div(PRI)
+    PR_avg.to_csv('./point_references/point_references_avg.csv')
