@@ -217,6 +217,8 @@ class gameAI:
 
         if self.mode == 'full':
             if self.new_plan == False or (self.g7_plan['decision'] == 'y' and self.last_order[0].name == 'G7'):
+                print([card.card_id for card in player_hand])
+                print([card.card_id for card in self.last_order])
                 card_selection_index = [card.name for card in player_hand].index(
                     self.last_order[0].name)
                 self.last_order = self.last_order[1:]
@@ -325,7 +327,7 @@ class gameAI:
                     else:
                         cutoff = 4
                     less_than_cut = list(filter(
-                        lambda x: x.base_points < cutoff, sorted_order))
+                        lambda x: x.base_points < cutoff and x.card_id != 'B7', sorted_order))
                     cut_or_more = list(filter(
                         lambda x: x.base_points > cutoff - 1 or x.card_id == 'B7', sorted_order))
                     if 'Y1' in order_ids:
@@ -427,12 +429,12 @@ class gameAI:
                             if sorted_order[i].card_id == 'R4':
                                 extra_flipped = i * \
                                     opponent_fill_dict['four_plus']
-                        if sum([item == 0 for sublist in [test_setup.p_zero_grid, test_setup.p_one_grid][test_setup.turn] for item in sublist]) > 0:
+                        if sum([item == 0 for sublist in [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)] for item in sublist]) > 0:
                             test_setup.next_turn()
                             found = False
                             for x in range(3):
                                 for y in range(3):
-                                    if opponent_grid[x][y] == 0:
+                                    if [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)][x][y] == 0:
                                         test_setup.play_card(
                                             abs(self.player_num - 1), 0, x, y)
                                         found = True
@@ -494,6 +496,8 @@ class gameAI:
 
             card_selection_index = [
                 card.name for card in player_hand].index(best_next_card_name)
+            
+            print([card.card_id for card in self.last_order])
 
             return card_selection_index, self.last_cpx_order.pop(0), self.last_cpy_order.pop(0)
 
