@@ -343,7 +343,8 @@ class gameAI:
                         insert_idx = 0
                         Y1_or_empty = False
                         finished = False
-
+                        g7_move_x = -1
+                        g7_move_y = -1
                         for i in range(3):
                             for j in range(3):
                                 if g7_test_grid[i][j] == 0:
@@ -360,6 +361,12 @@ class gameAI:
                                             g7_bloc + \
                                             sorted_order[insert_idx+1:]
                                         finished = True
+                                        if (g7_move_x, g7_move_y) == (-1,-1):
+                                            for k in range(3):
+                                                for l in range(3):
+                                                    if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
+                                                        g7_move_x = k
+                                                        g7_move_y = l
                                         break
                                     insert_idx += 1
                             if finished:
