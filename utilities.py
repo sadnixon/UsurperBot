@@ -34,7 +34,7 @@ def grid_deep_copy(grid,fill_card=0):
     return new_grid, fill_count
                 
 
-def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_dict={}, avg_card=N0, d_exp_dict={}, extra_flipped = 0):
+def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_dict={}, avg_card=N0, d_exp_dict={}, extra_flipped = 0, individuals = False):
     
     player_grid, _ = grid_deep_copy(player_grid_original)
     opponent_grid, _ = grid_deep_copy(opponent_grid_original)
@@ -367,14 +367,18 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
 
     bonus_points = bonus_points / len(player_bonus)
 
-    total = sum([item.points for sublist in player_grid for item in sublist])
+    indiv_points = [item.points for sublist in player_grid for item in sublist]
+
+    total = sum(indiv_points)
 
     for i in range(3):
         for j in range(3):
             player_grid[i][j].reset()
             opponent_grid[i][j].reset()
-
-    return total + bonus_points
+    if individuals:
+        return total + bonus_points, indiv_points, bonus_points
+    else:
+        return total + bonus_points
 
 
 def print_card_list(card_list):

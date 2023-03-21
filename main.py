@@ -134,10 +134,10 @@ class usurperGame:
             execute_pre_scoring(
                 self.setup, self.p_ai[0], self.p_zero_name, self.p_zero_type)
 
-        p_zero_score = evaluation(
-            self.setup.p_zero_grid, self.setup.p_one_grid, self.setup.p_zero_bonus)
-        p_one_score = evaluation(
-            self.setup.p_one_grid, self.setup.p_zero_grid, self.setup.p_one_bonus)
+        p_zero_score, p_zero_indivs, p_zero_bonus_score = evaluation(
+            self.setup.p_zero_grid, self.setup.p_one_grid, self.setup.p_zero_bonus, individuals=True)
+        p_one_score, p_one_indivs, p_one_bonus_score = evaluation(
+            self.setup.p_one_grid, self.setup.p_zero_grid, self.setup.p_one_bonus, individuals=True)
 
         print(f"{self.p_zero_name}'s bonus:")
         print_card_list(self.setup.p_zero_bonus)
@@ -173,8 +173,8 @@ class usurperGame:
                     if self.setup.p_one_grid[i][j].flipped:
                         self.setup.flip_card(1,i,j)
         
-        return p_zero_score, p_one_score, p_zero_draft, p_one_draft
+        return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
 
 
-game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full')
-game.mainLoop()
+#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full')
+#game.mainLoop()

@@ -13,7 +13,6 @@ import random
 import numpy as np
 import itertools
 import scipy.stats
-import time
 
 instant_priority = {'Y5': 0, 'G4': 1, 'R10': 2, 'R9': 3,
                     'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8}
@@ -223,7 +222,6 @@ class gameAI:
                 self.last_order = self.last_order[1:]
                 return card_selection_index, self.last_cpx_order.pop(0), self.last_cpy_order.pop(0)
 
-            times_list = []
             best_score = 0
             best_plan = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
             best_order = []
@@ -300,7 +298,7 @@ class gameAI:
                         continue
                     if out_of_place_limit == 2 and 'G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]:
                         continue
-                    start = time.time()
+
                     valid_orders += 1
                     sorted_order = order_list.copy()
                     sorted_order.sort(
@@ -473,7 +471,7 @@ class gameAI:
                             best_g7_plan = {
                                 'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
                     
-                    if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5:
+                    if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
                         curr_mean = np.mean(all_scores)
                         curr_std = np.std(all_scores)
                         remaining_orders = round(
@@ -486,8 +484,6 @@ class gameAI:
                             print('saved:')
                             print(remaining_orders)
                             break
-                    end = time.time()
-                    times_list.append(start-end)
 
             self.last_plan = best_plan
             self.last_order = best_order[1:]
@@ -498,7 +494,7 @@ class gameAI:
 
             card_selection_index = [
                 card.name for card in player_hand].index(best_next_card_name)
-            print(np.mean(times_list))
+
             return card_selection_index, self.last_cpx_order.pop(0), self.last_cpy_order.pop(0)
 
         elif self.mode == 'random':
