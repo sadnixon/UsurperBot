@@ -341,40 +341,37 @@ class gameAI:
                     order_ids = [card.card_id for card in sorted_order]
 
                     if g7_bloc != [0, 0]:
-                        g7_test_order = sorted_order.copy()
+                        g7_test_sorted_order = sorted_order.copy()
                         g7_test_grid = master_test_grid.copy()
+                        flat_grid_ids = [item.card_id for sublist in test_grid for item in sublist]
                         g7_test_grid[g7_placement_x][g7_placement_y] = g7_bloc[1]
                         insert_idx = 0
-                        Y1_or_empty = False
-                        finished = False
+                        Y1_found = False
                         g7_move_x = -1
                         g7_move_y = -1
-                        for i in range(3):
-                            for j in range(3):
-                                if g7_test_grid[i][j] == 0:
-                                    if len(g7_test_order) == 0 or g7_test_order[0] == 'Y1':
-                                        Y1_or_empty = True
-                                    else:
-                                        g7_test_grid[i][j] = g7_test_order.pop(
-                                            0)
-                                    if g7_bloc[0].placement_grid[i][j] != 0:
-                                        g7_move_x = i
-                                        g7_move_y = j
-                                    if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_or_empty or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2):
-                                        sorted_order = sorted_order[:insert_idx] + \
-                                            g7_bloc + \
-                                            sorted_order[insert_idx+1:]
-                                        finished = True
-                                        if (g7_move_x, g7_move_y) == (-1,-1):
-                                            for k in range(3):
-                                                for l in range(3):
-                                                    if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
-                                                        g7_move_x = k
-                                                        g7_move_y = l
-                                        break
-                                    insert_idx += 1
-                            if finished:
+                        for x in range(len(g7_test_sorted_order)):
+                            grid_index = flat_grid_ids.index(g7_test_sorted_order[0].card_id)
+                            i = grid_index//3
+                            j = grid_index%3
+                            if g7_test_sorted_order[0].card_id == 'Y1':
+                                Y1_found = True
+                            else:
+                                g7_test_grid[i][j] = g7_test_sorted_order.pop(0)
+                            if g7_bloc[0].placement_grid[i][j] != 0:
+                                g7_move_x = i
+                                g7_move_y = j
+                            if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_found or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2):
+                                sorted_order = sorted_order[:insert_idx] + \
+                                    g7_bloc + \
+                                    sorted_order[insert_idx:]
+                                if (g7_move_x, g7_move_y) == (-1,-1):
+                                    for k in range(3):
+                                        for l in range(3):
+                                            if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
+                                                g7_move_x = k
+                                                g7_move_y = l
                                 break
+                            insert_idx += 1
                         order_ids = [card.card_id for card in sorted_order]
                     # REMOVE LATER, JUST FOR SHOW
                     # print_card_list(test_grid[0])
