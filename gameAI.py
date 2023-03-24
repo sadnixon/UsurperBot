@@ -5,17 +5,17 @@ from gameDeck import gameDeck
 from gameSetup import gameSetup
 from utilities import evaluation
 from utilities import check_possible_placement
+from utilities import check_if_legal
 from utilities import grid_deep_copy
 from utilities import execute_instant
 from utilities import execute_pre_scoring
-from utilities import print_card_list
 import random
 import numpy as np
 import itertools
 import scipy.stats
 
 instant_priority = {'Y5': 0, 'G4': 1, 'R10': 2, 'R9': 3,
-                    'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8}
+                    'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8,'N0': 9}
 for color in ['R', 'G', 'Y', 'B']:
     for num in range(1, 12):
         if color+str(num) not in instant_priority:
@@ -194,13 +194,21 @@ class gameAI:
     def draft_decision(self, setup):
         if self.player_num == 0:
             player_hand = setup.p_zero_hand
+            player_grid = setup.p_zero_grid
         else:
             player_hand = setup.p_one_hand
+            player_grid = setup.p_one_grid
 
         if self.mode == 'full':
             # TODO MAKE DRAFT DECISION
+            for i in range(6):
+                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    return i
             return random.choice(range(6))
         elif self.mode == 'random':
+            for i in range(6):
+                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    return i
             return random.choice(range(6))
 
     def play_decision(self, setup):
@@ -232,275 +240,292 @@ class gameAI:
             best_next_card_name = ''
             best_cpx_order = []
             best_cpy_order = []
+            best_flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
 
             player_fill_dict, player_fill_card = self.average_card(True)
             opponent_fill_dict, opponent_fill_card = self.average_card()
 
             master_test_grid, open_spot_count = grid_deep_copy(player_grid)
-            all_combos = list(itertools.combinations(
-                player_hand, open_spot_count))
-            random.shuffle(all_combos)
-            for combo in all_combos:
-                if not check_possible_placement(player_grid, combo):
-                    continue
-                all_scores = []
-                all_orders = list(itertools.permutations(combo))
-                random.shuffle(all_orders)
-                num_orders = len(all_orders)
-                tested_orders = 0
-                valid_orders = 0
-                for order in all_orders:
-                    tested_orders += 1
-                    order_list = list(order)
-                    out_of_place = 0
-                    if 'G7' in [card.card_id for card in order_list] and open_spot_count>2 and (master_test_grid[1][2] == 0 or master_test_grid[2][0] == 0):
-                        out_of_place_limit = 2
-                    else:
-                        out_of_place_limit = 1
-                    order_list = [card.__copy__() for card in order_list]
-                    order_distributor = order_list.copy()
-                    test_grid, _ = grid_deep_copy(player_grid)
-                    grid_sum = 0
-                    for i in range(len(order_list)):
-                        grid_sum += sum(
-                            [item != 0 for sublist in order_list[i].placement_grid for item in sublist])
-                    if sum([card.activation for card in order_list]) > 0 and grid_sum > 59:
-                        pluses_floor = 1
-                    else:
-                        pluses_floor = 0
-                    pluses = 0
-                    g7_target_x = -1
-                    g7_target_y = -1
-                    g7_placement_x = -1
-                    g7_placement_y = -1
-                    for i in range(3):
-                        if out_of_place == out_of_place_limit:
-                            break
-                        for j in range(3):
-                            if test_grid[i][j] == 0:
-                                if order_distributor[0].placement_grid[i][j] == 0:
-                                    out_of_place += 1
-                                    if out_of_place == out_of_place_limit:
-                                        break
-                                    possible = False
-                                    for k in range(9):
-                                        if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0:
-                                            possible = True
-                                            break
-                                    if possible:
-                                        g7_card_id = order_distributor[0].card_id
-                                        g7_target_x = i
-                                        g7_target_y = j
-                                    else:
-                                        out_of_place = out_of_place_limit
-                                        break
-                                elif order_distributor[0].placement_grid[i][j] == 2:
-                                    pluses += 1
-                                if order_distributor[0].card_id == 'G7':
-                                    g7_placement_x = i
-                                    g7_placement_y = j
-                                test_grid[i][j] = order_distributor.pop(0)
-                    if out_of_place == out_of_place_limit or pluses < pluses_floor:
-                        continue
-                    if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y)):
-                        continue
 
-                    valid_orders += 1
-                    sorted_order = order_list.copy()
-                    sorted_order.sort(
-                        key=lambda x: instant_priority[x.card_id])
-                    order_ids = [card.card_id for card in sorted_order]
-                    g7_bloc = [0, 0]
-                    if 'G7' in order_ids and out_of_place == 1:
-                        if order_ids.index('G7') > order_ids.index(g7_card_id):
-                            g7_bloc[1] = sorted_order.pop(
-                                order_ids.index('G7'))
-                            g7_bloc[0] = sorted_order.pop(
-                                order_ids.index(g7_card_id))
+            combo_length = open_spot_count
+            found_possible_combo = False
+            while not found_possible_combo:
+                all_combos = list(itertools.combinations(
+                    player_hand, combo_length))
+                random.shuffle(all_combos)
+                for combo_base in all_combos:
+                    if check_if_legal(player_grid, combo_base) and not found_possible_combo:
+                        found_possible_combo = True
+                    else:
+                        continue
+                    
+                    combo = list(combo_base)
+                    for i in range(open_spot_count-combo_length):
+                        combo.append(N0.__copy__())
+
+                    all_scores = []
+                    all_orders = list(itertools.permutations(combo))
+                    random.shuffle(all_orders)
+                    num_orders = len(all_orders)
+                    tested_orders = 0
+                    valid_orders = 0
+                    for order in all_orders:
+                        tested_orders += 1
+                        order_list = list(order)
+                        out_of_place = 0
+                        if 'G7' in [card.card_id for card in order_list] and open_spot_count>2 and (master_test_grid[1][2] == 0 or master_test_grid[2][0] == 0):
+                            out_of_place_limit = 2
                         else:
-                            g7_bloc[0] = sorted_order.pop(
-                                order_ids.index(g7_card_id))
-                            g7_bloc[1] = sorted_order.pop(
-                                order_ids.index('G7'))
+                            out_of_place_limit = 1
+                        order_list = [card.__copy__() for card in order_list]
+                        order_distributor = order_list.copy()
+                        test_grid, _ = grid_deep_copy(player_grid)
+                        grid_sum = 0
+                        for i in range(len(order_list)):
+                            grid_sum += sum(
+                                [item != 0 for sublist in order_list[i].placement_grid for item in sublist])
+                        if sum([card.activation for card in order_list]) > 0 and grid_sum > 59:
+                            pluses_floor = 1
+                        else:
+                            pluses_floor = 0
+                        pluses = 0
+                        g7_target_x = -1
+                        g7_target_y = -1
+                        g7_placement_x = -1
+                        g7_placement_y = -1
+                        for i in range(3):
+                            if out_of_place == out_of_place_limit:
+                                break
+                            for j in range(3):
+                                if test_grid[i][j] == 0:
+                                    if order_distributor[0].placement_grid[i][j] == 0:
+                                        out_of_place += 1
+                                        if out_of_place == out_of_place_limit:
+                                            break
+                                        possible = False
+                                        for k in range(9):
+                                            if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0:
+                                                possible = True
+                                                break
+                                        if possible:
+                                            g7_card_id = order_distributor[0].card_id
+                                            g7_target_x = i
+                                            g7_target_y = j
+                                        else:
+                                            out_of_place = out_of_place_limit
+                                            break
+                                    elif order_distributor[0].placement_grid[i][j] == 2:
+                                        pluses += 1
+                                    if order_distributor[0].card_id == 'G7':
+                                        g7_placement_x = i
+                                        g7_placement_y = j
+                                    test_grid[i][j] = order_distributor.pop(0)
+                        if out_of_place == out_of_place_limit or pluses < pluses_floor:
+                            continue
+                        if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y)):
+                            continue
+
+                        valid_orders += 1
+                        sorted_order = order_list.copy()
+                        sorted_order.sort(
+                            key=lambda x: instant_priority[x.card_id])
                         order_ids = [card.card_id for card in sorted_order]
-
-                    if 'Y1' in order_ids:
-                        y1_bloc = [sorted_order.pop(order_ids.index('Y1'))]
-                    if 'R11' in order_ids:
-                        cutoff = 6
-                    else:
-                        cutoff = 4
-                    less_than_cut = list(filter(
-                        lambda x: x.base_points < cutoff and x.card_id != 'B7', sorted_order))
-                    cut_or_more = list(filter(
-                        lambda x: x.base_points > cutoff - 1 or x.card_id == 'B7', sorted_order))
-                    if 'Y1' in order_ids:
-                        sorted_order = less_than_cut + y1_bloc + cut_or_more
-                    else:
-                        sorted_order = less_than_cut + cut_or_more
-                    order_ids = [card.card_id for card in sorted_order]
-
-                    if g7_bloc != [0, 0]:
-                        g7_test_sorted_order = sorted_order.copy()
-                        g7_test_grid = master_test_grid.copy()
-                        flat_grid_ids = [item.card_id for sublist in test_grid for item in sublist]
-                        g7_test_grid[g7_placement_x][g7_placement_y] = g7_bloc[1]
-                        insert_idx = 0
-                        Y1_found = False
-                        g7_move_x = -1
-                        g7_move_y = -1
-                        for x in range(len(g7_test_sorted_order)):
-                            grid_index = flat_grid_ids.index(g7_test_sorted_order[0].card_id)
-                            i = grid_index//3
-                            j = grid_index%3
-                            if g7_test_sorted_order[0].card_id == 'Y1':
-                                Y1_found = True
+                        g7_bloc = [0, 0]
+                        if 'G7' in order_ids and out_of_place == 1:
+                            if order_ids.index('G7') > order_ids.index(g7_card_id):
+                                g7_bloc[1] = sorted_order.pop(
+                                    order_ids.index('G7'))
+                                g7_bloc[0] = sorted_order.pop(
+                                    order_ids.index(g7_card_id))
                             else:
-                                g7_test_grid[i][j] = g7_test_sorted_order.pop(0)
-                            if g7_bloc[0].placement_grid[i][j] != 0:
-                                g7_move_x = i
-                                g7_move_y = j
-                            if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_found or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2):
-                                sorted_order = sorted_order[:insert_idx] + \
-                                    g7_bloc + \
-                                    sorted_order[insert_idx:]
-                                if (g7_move_x, g7_move_y) == (-1,-1):
-                                    for k in range(3):
-                                        for l in range(3):
-                                            if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
-                                                g7_move_x = k
-                                                g7_move_y = l
-                                break
-                            insert_idx += 1
+                                g7_bloc[0] = sorted_order.pop(
+                                    order_ids.index(g7_card_id))
+                                g7_bloc[1] = sorted_order.pop(
+                                    order_ids.index('G7'))
+                            order_ids = [card.card_id for card in sorted_order]
+
+                        if 'Y1' in order_ids:
+                            y1_bloc = [sorted_order.pop(order_ids.index('Y1'))]
+                        if 'R11' in order_ids:
+                            cutoff = 6
+                        else:
+                            cutoff = 4
+                        less_than_cut = list(filter(
+                            lambda x: x.base_points < cutoff and x.card_id not in ['B7','N0'], sorted_order))
+                        cut_or_more = list(filter(
+                            lambda x: x.base_points > cutoff - 1 or x.card_id == 'B7', sorted_order))
+                        filler_cards = list(filter(lambda x: x.card_id == 'N0', sorted_order))
+                        if 'Y1' in order_ids:
+                            sorted_order = less_than_cut + y1_bloc + cut_or_more + filler_cards
+                        else:
+                            sorted_order = less_than_cut + cut_or_more + filler_cards
                         order_ids = [card.card_id for card in sorted_order]
-                    # REMOVE LATER, JUST FOR SHOW
-                    # print_card_list(test_grid[0])
-                    # print_card_list(test_grid[1])
-                    # print_card_list(test_grid[2])
-                    test_setup = gameSetup()
-                    test_setup.main_deck.deck = []
-                    for i in range(len(setup.main_deck.deck)):
-                        test_setup.main_deck.deck.append(
-                            player_fill_card.__copy__())
-                    test_setup.possible_opp_cards = self.possible_opp_cards.copy()
-                    test_setup.confirmed_opp_cards = self.confirmed_opp_cards.copy()
-                    test_setup.max_unknown = self.max_unknown
-                    test_setup.possible_bonus_cards = self.possible_opp_bonus_cards.copy()
-                    self.last_plan, _ = grid_deep_copy(test_grid)
-                    self.flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
 
-                    if self.player_num == 0:
-                        test_setup.p_zero_grid, _ = grid_deep_copy(player_grid)
-                        test_setup.p_one_grid, fill_card_count = grid_deep_copy(
-                            opponent_grid)
-                        test_setup.p_zero_bonus = player_bonus
-                        test_setup.p_one_bonus = self.possible_opp_bonus_cards
-                        test_setup.p_zero_hand = sorted_order.copy()
-                        for i in range(fill_card_count):
-                            test_setup.p_one_hand.append(
-                                opponent_fill_card.__copy__())
-                        test_setup.turn = 0
-                    else:
-                        test_setup.p_one_grid, _ = grid_deep_copy(player_grid)
-                        test_setup.p_zero_grid, fill_card_count = grid_deep_copy(
-                            opponent_grid)
-                        test_setup.p_one_bonus = player_bonus
-                        test_setup.p_zero_bonus = self.possible_opp_bonus_cards
-                        test_setup.p_one_hand = sorted_order.copy()
-                        for i in range(fill_card_count):
-                            test_setup.p_zero_hand.append(
-                                opponent_fill_card.__copy__())
-                        test_setup.turn = 1
-
-                    extra_flipped = 0
-                    cpx_list = []
-                    cpy_list = []
-                    for i in range(len(sorted_order)):
-                        found = False
-                        for x in range(3):
-                            for y in range(3):
-                                if test_grid[x][y].card_id == sorted_order[i].card_id:
-                                    test_setup.play_card(
-                                        self.player_num, 0, x, y)
-                                    if g7_bloc != [0, 0] and sorted_order[i].card_id == g7_bloc[0].card_id:
-                                        cpx_list.append(g7_move_x)
-                                        cpy_list.append(g7_move_y)
-                                    else:
-                                        cpx_list.append(x)
-                                        cpy_list.append(y)
-                                    found = True
+                        if g7_bloc != [0, 0]:
+                            g7_test_sorted_order = sorted_order.copy()
+                            g7_test_grid = master_test_grid.copy()
+                            flat_grid_ids = [item.card_id for sublist in test_grid for item in sublist]
+                            g7_test_grid[g7_placement_x][g7_placement_y] = g7_bloc[1]
+                            insert_idx = 0
+                            Y1_or_N0_found = False
+                            g7_move_x = -1
+                            g7_move_y = -1
+                            for x in range(len(g7_test_sorted_order)):
+                                grid_index = flat_grid_ids.index(g7_test_sorted_order[0].card_id)
+                                i = grid_index//3
+                                j = grid_index%3
+                                if g7_test_sorted_order[0].card_id in ['Y1','N0']:
+                                    Y1_or_N0_found = True
+                                else:
+                                    g7_test_grid[i][j] = g7_test_sorted_order.pop(0)
+                                if g7_bloc[0].placement_grid[i][j] != 0:
+                                    g7_move_x = i
+                                    g7_move_y = j
+                                if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_or_N0_found or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2):
+                                    sorted_order = sorted_order[:insert_idx] + \
+                                        g7_bloc + \
+                                        sorted_order[insert_idx:]
+                                    if (g7_move_x, g7_move_y) == (-1,-1):
+                                        for k in range(3):
+                                            for l in range(3):
+                                                if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
+                                                    g7_move_x = k
+                                                    g7_move_y = l
                                     break
-                            if found:
-                                break
-                        if (sorted_order[i].card_id in ['R7', 'R4', 'R8', 'Y8'] and sorted_order[i].placement_grid[x][y] == 2) or sorted_order[i].card_id == 'Y1':
-                            execute_instant(test_setup, self.player_num, [
-                                            self, self], 'filler', 'filler', 'AI', 'AI', x, y, True)
-                            if sorted_order[i].card_id == 'R4':
-                                extra_flipped = i * \
-                                    opponent_fill_dict['four_plus']
-                        if sum([item == 0 for sublist in [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)] for item in sublist]) > 0:
-                            test_setup.next_turn()
+                                insert_idx += 1
+                            order_ids = [card.card_id for card in sorted_order]
+                        # REMOVE LATER, JUST FOR SHOW
+                        # print_card_list(test_grid[0])
+                        # print_card_list(test_grid[1])
+                        # print_card_list(test_grid[2])
+                        test_setup = gameSetup()
+                        test_setup.main_deck.deck = []
+                        for i in range(len(setup.main_deck.deck)):
+                            test_setup.main_deck.deck.append(
+                                player_fill_card.__copy__())
+                        test_setup.possible_opp_cards = self.possible_opp_cards.copy()
+                        test_setup.confirmed_opp_cards = self.confirmed_opp_cards.copy()
+                        test_setup.max_unknown = self.max_unknown
+                        test_setup.possible_bonus_cards = self.possible_opp_bonus_cards.copy()
+                        self.last_plan, _ = grid_deep_copy(test_grid)
+                        self.flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
+
+                        if self.player_num == 0:
+                            test_setup.p_zero_grid, _ = grid_deep_copy(player_grid)
+                            test_setup.p_one_grid, fill_card_count = grid_deep_copy(
+                                opponent_grid)
+                            test_setup.p_zero_bonus = player_bonus
+                            test_setup.p_one_bonus = self.possible_opp_bonus_cards
+                            test_setup.p_zero_hand = sorted_order.copy()
+                            for i in range(fill_card_count):
+                                test_setup.p_one_hand.append(
+                                    opponent_fill_card.__copy__())
+                            test_setup.turn = 0
+                        else:
+                            test_setup.p_one_grid, _ = grid_deep_copy(player_grid)
+                            test_setup.p_zero_grid, fill_card_count = grid_deep_copy(
+                                opponent_grid)
+                            test_setup.p_one_bonus = player_bonus
+                            test_setup.p_zero_bonus = self.possible_opp_bonus_cards
+                            test_setup.p_one_hand = sorted_order.copy()
+                            for i in range(fill_card_count):
+                                test_setup.p_zero_hand.append(
+                                    opponent_fill_card.__copy__())
+                            test_setup.turn = 1
+
+                        extra_flipped = 0
+                        cpx_list = []
+                        cpy_list = []
+                        for i in range(len(sorted_order)):
                             found = False
                             for x in range(3):
                                 for y in range(3):
-                                    if [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)][x][y] == 0:
+                                    if test_grid[x][y].card_id == sorted_order[i].card_id:
                                         test_setup.play_card(
-                                            abs(self.player_num - 1), 0, x, y)
+                                            self.player_num, 0, x, y)
+                                        if g7_bloc != [0, 0] and sorted_order[i].card_id == g7_bloc[0].card_id:
+                                            cpx_list.append(g7_move_x)
+                                            cpy_list.append(g7_move_y)
+                                        else:
+                                            cpx_list.append(x)
+                                            cpy_list.append(y)
                                         found = True
                                         break
                                 if found:
                                     break
-                            test_setup.next_turn()
-                    execute_pre_scoring(
-                        test_setup, self, 'filler', 'AI', test=True)
-                    test_setup.next_turn()
-                    execute_pre_scoring(
-                        test_setup, self, 'filler', 'AI', test=True)
+                            if (sorted_order[i].card_id in ['R7', 'R4', 'R8', 'Y8'] and sorted_order[i].placement_grid[x][y] == 2) or sorted_order[i].card_id == 'Y1':
+                                execute_instant(test_setup, self.player_num, [
+                                                self, self], 'filler', 'filler', 'AI', 'AI', x, y, True)
+                                if sorted_order[i].card_id == 'R4':
+                                    extra_flipped = i * \
+                                        opponent_fill_dict['four_plus']
+                            if sum([item == 0 for sublist in [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)] for item in sublist]) > 0:
+                                test_setup.next_turn()
+                                found = False
+                                for x in range(3):
+                                    for y in range(3):
+                                        if [test_setup.p_zero_grid, test_setup.p_one_grid][abs(self.player_num - 1)][x][y] == 0:
+                                            test_setup.play_card(
+                                                abs(self.player_num - 1), 0, x, y)
+                                            found = True
+                                            break
+                                    if found:
+                                        break
+                                test_setup.next_turn()
+                        execute_pre_scoring(
+                            test_setup, self, 'filler', 'AI', test=True)
+                        test_setup.next_turn()
+                        execute_pre_scoring(
+                            test_setup, self, 'filler', 'AI', test=True)
 
-                    if self.player_num == 0:
-                        test_score = evaluation(test_setup.p_zero_grid, test_setup.p_one_grid, test_setup.p_zero_bonus,
-                                                opponent_fill_dict, opponent_fill_card, player_fill_dict, extra_flipped=extra_flipped)
-                        test_final_grid = test_setup.p_zero_grid
-                    else:
-                        test_score = evaluation(test_setup.p_one_grid, test_setup.p_zero_grid, test_setup.p_one_bonus,
-                                                opponent_fill_dict, opponent_fill_card, player_fill_dict, extra_flipped=extra_flipped)
-                        test_final_grid = test_setup.p_one_grid
-
-                    all_scores.append(test_score)
-
-                    if test_score > best_score:
-                        best_score = test_score
-                        best_plan, _ = grid_deep_copy(test_final_grid)
-                        best_order = sorted_order
-                        best_next_card_name = sorted_order[0].name
-                        best_cpx_order = cpx_list
-                        best_cpy_order = cpy_list
-                        if g7_bloc != [0, 0]:
-                            best_g7_plan = {'decision': 'y', 'move_x': g7_move_x,
-                                            'move_y': g7_move_x, 'target_x': g7_target_x, 'target_y': g7_target_y}
+                        if self.player_num == 0:
+                            test_score = evaluation(test_setup.p_zero_grid, test_setup.p_one_grid, test_setup.p_zero_bonus,
+                                                    opponent_fill_dict, opponent_fill_card, player_fill_dict, extra_flipped=extra_flipped)
+                            test_final_grid = test_setup.p_zero_grid
                         else:
-                            best_g7_plan = {
-                                'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
-                    
-                    if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
-                        curr_mean = np.mean(all_scores)
-                        curr_std = np.std(all_scores)
-                        remaining_orders = round(
-                            valid_orders/tested_orders * (num_orders-tested_orders))
-                        chance_of_better = scipy.stats.norm.sf(
-                            best_score+5, curr_mean, curr_std)
-                        chance_over_time = scipy.stats.binom.sf(
-                            k=0, n=remaining_orders, p=chance_of_better)
-                        if chance_over_time < 0.10:
-                            print('saved:')
-                            print(remaining_orders)
-                            break
+                            test_score = evaluation(test_setup.p_one_grid, test_setup.p_zero_grid, test_setup.p_one_bonus,
+                                                    opponent_fill_dict, opponent_fill_card, player_fill_dict, extra_flipped=extra_flipped)
+                            test_final_grid = test_setup.p_one_grid
+
+                        all_scores.append(test_score)
+
+                        if test_score > best_score:
+                            best_score = test_score
+                            best_plan, _ = grid_deep_copy(test_final_grid)
+                            best_order = sorted_order
+                            best_next_card_name = sorted_order[0].name
+                            best_cpx_order = cpx_list
+                            best_cpy_order = cpy_list
+                            best_flip_ids = self.flip_ids.copy()
+                            if g7_bloc != [0, 0]:
+                                best_g7_plan = {'decision': 'y', 'move_x': g7_move_x,
+                                                'move_y': g7_move_x, 'target_x': g7_target_x, 'target_y': g7_target_y}
+                            else:
+                                best_g7_plan = {
+                                    'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
+                        
+                        if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
+                            curr_mean = np.mean(all_scores)
+                            curr_std = np.std(all_scores)
+                            remaining_orders = round(
+                                valid_orders/tested_orders * (num_orders-tested_orders))
+                            chance_of_better = scipy.stats.norm.sf(
+                                best_score+5, curr_mean, curr_std)
+                            chance_over_time = scipy.stats.binom.sf(
+                                k=0, n=remaining_orders, p=chance_of_better)
+                            if chance_over_time < 0.10:
+                                print('saved:')
+                                print(remaining_orders)
+                                break
+                if not found_possible_combo:
+                    combo_length -= 1
 
             self.last_plan = best_plan
-            self.last_order = best_order[1:]
+            self.last_order = list(filter(lambda x: x.card_id != 'N0', best_order[1:]))
             self.g7_plan = best_g7_plan
             self.last_cpx_order = best_cpx_order
             self.last_cpy_order = best_cpy_order
+            self.flip_ids = best_flip_ids
             self.new_plan = False
 
             card_selection_index = [
@@ -544,7 +569,7 @@ class gameAI:
                     for y in range(3):
                         if player_grid[x][y] != 0:
                             test_grid, _ = grid_deep_copy(self.last_plan)
-                            if test_grid[x][y].card_id != player_grid[x][y].card_id:
+                            if test_grid[x][y].name != player_grid[x][y].name:
                                 continue
                             test_grid[x][y] = replacement_card
                             player_score_xy = evaluation(
@@ -677,17 +702,9 @@ class gameAI:
             self.new_plan = True
             if self.mode == 'full':
                 # TODO UPDATE WITH DRAFTING WEIGHTS
-                for i in range(4):
-                    card_selection_x = random.choice(range(4))
-                    if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
-                        return card_selection_x
-                return card_selection_x
+                return random.choice(range(4))
             elif self.mode == 'random':
-                for i in range(4):
-                    card_selection_x = random.choice(range(4))
-                    if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
-                        return card_selection_x
-                return card_selection_x
+                return random.choice(range(4))
         elif instant_id == 'Y8':
             if self.mode == 'full':
                 if not test:
@@ -726,11 +743,11 @@ class gameAI:
                     for x in range(len(player_hand)):
                         test_grid, _ = grid_deep_copy(self.last_plan)
                         flat_test_grid = [
-                            item.card_id for sublist in test_grid for item in sublist]
-                        if player_hand[x].card_id not in flat_test_grid:
+                            item.name for sublist in test_grid for item in sublist]
+                        if player_hand[x].name not in flat_test_grid:
                             return x
                         flat_index = flat_test_grid.index(
-                            player_hand[x].card_id)
+                            player_hand[x].name)
                         test_grid[flat_index//3][flat_index %
                                                  3] = replacement_card
                         player_score_x = evaluation(
@@ -741,21 +758,19 @@ class gameAI:
                     return card_selection_x
                 else:
                     # TODO UPDATE WITH DRAFTING WEIGHTS
-                    for i in range(3):
-                        card_selection_x = random.choice(range(3))
-                        if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                    for card_selection_x in range(3):
+                        if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
                             return card_selection_x
-                    return card_selection_x
+                    return random.choice(range(3))
                         
             elif self.mode == 'random':
                 if len(setup.draft_options) == 0:
                     return random.choice(range(len(player_hand)))
                 else:
-                    for i in range(3):
-                        card_selection_x = random.choice(range(3))
-                        if check_possible_placement(player_grid, setup.draft_options, True, card_selection_x):
+                    for card_selection_x in range(3):
+                        if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
                             return card_selection_x
-                    return card_selection_x
+                    return random.choice(range(3))
         elif instant_id == 'G7':
             if self.mode == 'full':
                 return self.g7_plan['decision'], self.g7_plan['move_x'], self.g7_plan['move_y'], self.g7_plan['target_x'], self.g7_plan['target_y']

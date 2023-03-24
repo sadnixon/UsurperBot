@@ -4,6 +4,7 @@ from gameCard import gameCard
 from gameDeck import gameDeck
 from gameSetup import gameSetup
 import random
+import constraint
 
 pair_list = []
 for i in range(2):
@@ -838,3 +839,21 @@ def check_possible_placement(player_grid,player_hand,single=False,hand_index=0):
             break
     
     return possible
+
+def check_if_legal(player_grid,player_hand):
+    not_allowed = []
+    for i in range(9):
+        if player_grid[i//3][i%3] != 0:
+            not_allowed.append(i)
+        elif isinstance(player_grid[i//3][i%3], gameCard) and player_grid[i//3][i%3].card_id != 'N0':
+            not_allowed.append(i)
+    problem = constraint.Problem(constraint.RecursiveBacktrackingSolver())
+    for card in player_hand:
+        problem.addVariable(card.card_id,card.placement_indices)
+    problem.addConstraint(constraint.AllDifferentConstraint())
+    problem.addConstraint(constraint.NotInSetConstraint(not_allowed))
+    solution = problem.getSolution()
+    if solution:
+        return True
+    else:
+        return False
