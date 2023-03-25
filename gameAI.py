@@ -381,7 +381,7 @@ class gameAI:
                                 if g7_bloc[0].placement_grid[i][j] != 0:
                                     g7_move_x = i
                                     g7_move_y = j
-                                if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_or_N0_found or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2):
+                                if not check_possible_placement(g7_test_grid, g7_bloc, True, 0) or Y1_or_N0_found or (g7_bloc[0].instant and g7_bloc[0].placement_grid[i][j] == 2) or len(g7_test_sorted_order) == 0:
                                     sorted_order = sorted_order[:insert_idx] + \
                                         g7_bloc + \
                                         sorted_order[insert_idx:]
