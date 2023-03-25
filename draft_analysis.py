@@ -239,12 +239,14 @@ for i in range(x):
                 combo_list[1])][p_one_draft[j]][p_one_draft[j]] += 1
             
             if p_zero_grid[j//3][j%3] != 0:
-                PR[combo_list[0]][p_zero_grid[j//3][j%3].card_id] += p_zero_indivs[j]
-                PRI[combo_list[0]][p_zero_grid[j//3][j%3].card_id] += 1
+                if p_zero_grid[j//3][j%3].card_id not in ['A0','dA0','N0']:
+                    PR[combo_list[0]][p_zero_grid[j//3][j%3].card_id] += p_zero_indivs[j]
+                    PRI[combo_list[0]][p_zero_grid[j//3][j%3].card_id] += 1
 
             if p_one_grid[j//3][j%3] != 0:
-                PR[combo_list[0]][p_one_grid[j//3][j%3].card_id] += p_one_indivs[j]
-                PRI[combo_list[0]][p_one_grid[j//3][j%3].card_id] += 1
+                if p_one_grid[j//3][j%3].card_id not in ['A0','dA0','N0']:
+                    PR[combo_list[0]][p_one_grid[j//3][j%3].card_id] += p_one_indivs[j]
+                    PRI[combo_list[0]][p_one_grid[j//3][j%3].card_id] += 1
 
             for k in range(9):
                 if k >= j+1:

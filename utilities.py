@@ -367,7 +367,6 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
             break
 
     bonus_points = bonus_points / len(player_bonus)
-
     indiv_points = [item.points for sublist in player_grid for item in sublist]
 
     total = sum(indiv_points)
