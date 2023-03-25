@@ -499,7 +499,7 @@ class gameAI:
                             best_flip_ids = self.flip_ids.copy()
                             if g7_bloc != [0, 0]:
                                 best_g7_plan = {'decision': 'y', 'move_x': g7_move_x,
-                                                'move_y': g7_move_x, 'target_x': g7_target_x, 'target_y': g7_target_y}
+                                                'move_y': g7_move_y, 'target_x': g7_target_x, 'target_y': g7_target_y}
                             else:
                                 best_g7_plan = {
                                     'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
@@ -532,6 +532,7 @@ class gameAI:
                 card.name for card in player_hand].index(best_next_card_name)
             
             print([card.card_id for card in self.last_order])
+            print(self.g7_plan)
 
             return card_selection_index, self.last_cpx_order.pop(0), self.last_cpy_order.pop(0)
 
