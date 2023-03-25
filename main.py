@@ -111,7 +111,8 @@ class usurperGame:
 
             self.setup.play_card(
                 self.setup.turn, card_selection_index, card_placement_x, card_placement_y)
-
+            print(card_placement_x,card_placement_y)
+            print([self.setup.p_zero_grid,self.setup.p_one_grid][self.setup.turn][card_placement_x][card_placement_y])
             self.p_ai[abs(self.setup.turn - 1)].opp_play_card([self.setup.p_zero_grid,
                                                                self.setup.p_one_grid][self.setup.turn][card_placement_x][card_placement_y])
 
