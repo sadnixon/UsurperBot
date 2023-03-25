@@ -6,10 +6,11 @@ import random
 
 
 class gameSetup:
-    def __init__(self,p_zero_bonus_id='',p_one_bonus_id=''):
+    def __init__(self, p_zero_bonus_id='', p_one_bonus_id=''):
         self.main_deck = gameDeck()
         self.bonus_deck = gameBonusDeck()
-        self.B7_card = self.main_deck.deck[[card.card_id for card in self.main_deck.deck].index('B7')]
+        self.B7_card = self.main_deck.deck[[
+            card.card_id for card in self.main_deck.deck].index('B7')]
         self.draft_options = []
         self.discard_pile = []
         self.p_zero_hand = []
@@ -25,7 +26,6 @@ class gameSetup:
         self.turn = random.choice([0, 1])
         self.p_zero_bonus_id = p_zero_bonus_id
         self.p_one_bonus_id = p_one_bonus_id
-
 
     def next_turn(self):
         if self.turn == 0:
@@ -102,14 +102,16 @@ class gameSetup:
             self.p_one_grid[pos_x][pos_y].flip()
         self.update_B7()
 
-    def copy_card(self,player,pos_x,pos_y):
+    def copy_card(self, player, pos_x, pos_y):
         if player == 0:
-            self.p_zero_grid[pos_x][pos_y].g3_copy(self.p_zero_grid[pos_x][pos_y+1])
+            self.p_zero_grid[pos_x][pos_y].g3_copy(
+                self.p_zero_grid[pos_x][pos_y+1])
         else:
-            self.p_one_grid[pos_x][pos_y].g3_copy(self.p_one_grid[pos_x][pos_y+1])
+            self.p_one_grid[pos_x][pos_y].g3_copy(
+                self.p_one_grid[pos_x][pos_y+1])
         self.update_B7()
-    
-    def un_copy_card(self,player,pos_x,pos_y):
+
+    def un_copy_card(self, player, pos_x, pos_y):
         if player == 0:
             self.p_zero_grid[pos_x][pos_y].un_copy()
         else:
@@ -129,13 +131,15 @@ class gameSetup:
 
     def move_card(self, player, pos_x, pos_y, target_pos_x, target_pos_y):
         if player == 0:
-            self.p_zero_grid[target_pos_x] = self.p_zero_grid[target_pos_x][:target_pos_y] + [
-                self.p_zero_grid[pos_x].pop(pos_y)] + self.p_zero_grid[target_pos_x][target_pos_y+1:]
+            moving_card = self.p_zero_grid[pos_x].pop(pos_y)
             self.p_zero_grid[pos_x].insert(pos_y, 0)
+            self.p_zero_grid[target_pos_x] = self.p_zero_grid[target_pos_x][:target_pos_y] + [
+                moving_card] + self.p_zero_grid[target_pos_x][target_pos_y+1:]
         else:
-            self.p_one_grid[target_pos_x] = self.p_one_grid[target_pos_x][:target_pos_y] + [
-                self.p_one_grid[pos_x].pop(pos_y)] + self.p_one_grid[target_pos_x][target_pos_y+1:]
+            moving_card = self.p_one_grid[pos_x].pop(pos_y)
             self.p_one_grid[pos_x].insert(pos_y, 0)
+            self.p_one_grid[target_pos_x] = self.p_one_grid[target_pos_x][:target_pos_y] + [
+                moving_card] + self.p_one_grid[target_pos_x][target_pos_y+1:]
 
     def update_B7(self):
         hands_sum = 0
