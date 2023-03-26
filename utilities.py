@@ -852,7 +852,7 @@ def check_if_legal(player_grid,player_hand):
             if moving_card.card_id =='G7':
                 continue
             elif set(moving_card.placement_indices) - set(not_allowed) != set([]):
-                hand_copy = player_hand.copy()
+                hand_copy = list(player_hand).copy()
                 hand_copy.remove(moving_card)
                 problem = constraint.Problem(constraint.RecursiveBacktrackingSolver())
                 for card in player_hand:
