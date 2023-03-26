@@ -26,8 +26,6 @@ class usurperGame:
         print("Begin draft phase.")
         self.setup.start_draft_phase()
 
-        print([card.card_id for card in self.setup.main_deck.deck])
-
         self.p_ai[0].player_see_bonus(self.setup.p_zero_bonus[0])
         self.p_ai[1].player_see_bonus(self.setup.p_one_bonus[0])
 
@@ -169,7 +167,7 @@ class usurperGame:
 
 
 #game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full',
-#                   'X3','X10',
-#                   ['Y11', 'G7', 'Y3', 'B7', 'R10', 'Y8', 'R9', 'G1', 'Y7', 'G9', 'R8', 'R1', 'G8', 'B3', 'R2', 'R4', 'B2', 'B8', 'B6', 'B10', 'Y2', 'G10', 'R7', 'R3' , 'R6', 'R5', 'R11', 'Y1', 'Y4' , 'G11'],
-#                   1)
+#                   'X8','X9',
+#                   ['Y2','R11','R3', 'B4','Y7', 'Y4','G11', 'R2', 'G6', 'G9', 'G7', 'Y5', 'B2', 'R5', 'G4', 'G3', 'Y9', 'R8', 'G8', 'B1', 'G1', 'R4', 'B5', 'Y3', 'G5', 'G2', 'R7', 'R6', 'Y8', 'B10', 'G10', 'R9', 'B7', 'B8', 'Y6', 'B9', 'B3', 'Y10', 'R1', 'Y11', 'Y1', 'R10', 'B6', 'B11'],
+#                   0)
 #game.mainLoop()

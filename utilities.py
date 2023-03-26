@@ -3,7 +3,6 @@ from gameBonusDeck import gameBonusDeck
 from gameCard import gameCard
 from gameDeck import gameDeck
 from gameSetup import gameSetup
-import random
 import constraint
 
 pair_list = []
@@ -484,11 +483,11 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(player, replacement_x, replacement_y)
 
-        if player_grid[replacement_x][replacement_y].instant:
-            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
-
         player_ai.deck_to_board(player_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(player_grid[replacement_x][replacement_y])
+
+        if player_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
         if opponent_grid == [[0,0,0],[0,0,0],[0,0,0]]:
             return print(f"{opponent_name} has no cards to replace!")
@@ -509,11 +508,11 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             replacement_x, replacement_y = opp_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(opponent, replacement_x, replacement_y)
 
-        if opponent_grid[replacement_x][replacement_y].instant:
-            execute_instant(setup, opponent, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
-
         player_ai.deck_to_board(opponent_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(opponent_grid[replacement_x][replacement_y])
+
+        if opponent_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, opponent, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
     elif instant_id == 'R4':
         if pos_x == 1 or pos_y != 1:
@@ -570,11 +569,11 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                 return
         setup.replace(player, replacement_x, replacement_y)
 
-        if player_grid[replacement_x][replacement_y].instant:
-            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
-
         player_ai.deck_to_board(player_grid[replacement_x][replacement_y])
         opp_ai.deck_to_board(player_grid[replacement_x][replacement_y])
+
+        if player_grid[replacement_x][replacement_y].instant:
+            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
 
     elif instant_id == 'R8':
         if pos_x != 1 or pos_y == 1:

@@ -43,6 +43,7 @@ class gameSetup:
         else:
             self.main_deck.shuffle()
         self.bonus_deck.shuffle()
+        print([card.card_id for card in self.main_deck.deck])
         for i in range(6):
             self.draft_options.append(self.main_deck.deal())
 

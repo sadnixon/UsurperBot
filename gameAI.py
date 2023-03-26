@@ -232,7 +232,7 @@ class gameAI:
                 self.last_order = self.last_order[1:]
                 return card_selection_index, self.last_cpx_order.pop(0), self.last_cpy_order.pop(0)
 
-            best_score = 0
+            best_score = -50
             best_plan = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
             best_order = []
             best_g7_plan = {'decision': 'n', 'move_x': -1,
@@ -252,9 +252,9 @@ class gameAI:
             while not found_possible_combo:
                 all_combos = list(itertools.combinations(
                     player_hand, combo_length))
-                random.shuffle(all_combos)
+                random.Random(4).shuffle(all_combos)
                 for combo_base in all_combos:
-                    if check_if_legal(player_grid, combo_base) and not found_possible_combo:
+                    if check_if_legal(player_grid, combo_base):
                         found_possible_combo = True
                     else:
                         continue
@@ -265,7 +265,7 @@ class gameAI:
 
                     all_scores = []
                     all_orders = list(itertools.permutations(combo))
-                    random.shuffle(all_orders)
+                    random.Random(4).shuffle(all_orders)
                     num_orders = len(all_orders)
                     tested_orders = 0
                     valid_orders = 0
@@ -503,6 +503,7 @@ class gameAI:
                             else:
                                 best_g7_plan = {
                                     'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
+                                
                         if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
                             curr_mean = np.mean(all_scores)
                             curr_std = np.std(all_scores)
