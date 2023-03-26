@@ -846,6 +846,27 @@ def check_if_legal(player_grid,player_hand):
             not_allowed.append(i)
         elif isinstance(player_grid[i//3][i%3], gameCard) and player_grid[i//3][i%3].card_id != 'N0':
             not_allowed.append(i)
+    
+    if 'G7' in [card.card_id for card in player_hand] and len(not_allowed) < 8 and (5 not in not_allowed or 6 not in not_allowed):
+        for moving_card in player_hand:
+            if moving_card.card_id =='G7':
+                continue
+            elif set(moving_card.placement_indices) - set(not_allowed) != set([]):
+                hand_copy = player_hand.copy()
+                hand_copy.remove(moving_card)
+                problem = constraint.Problem(constraint.RecursiveBacktrackingSolver())
+                for card in player_hand:
+                    if card.card_id == 'G7':
+                        problem.addVariable(card.card_id,[5,6])
+                    else:
+                        problem.addVariable(card.card_id,card.placement_indices)
+                problem.addConstraint(constraint.AllDifferentConstraint(),[card.card_id for card in hand_copy])
+                problem.addConstraint(constraint.AllDifferentConstraint(),['G7',moving_card.card_id])
+                problem.addConstraint(constraint.NotInSetConstraint(not_allowed))
+                solution = problem.getSolution()
+                if solution:
+                    return True
+    
     problem = constraint.Problem(constraint.RecursiveBacktrackingSolver())
     for card in player_hand:
         problem.addVariable(card.card_id,card.placement_indices)
