@@ -6,7 +6,7 @@ import random
 
 
 class gameSetup:
-    def __init__(self, p_zero_bonus_id='', p_one_bonus_id=''):
+    def __init__(self, p_zero_bonus_id='', p_one_bonus_id='', prebake_order=[], prebake_starter=-1):
         self.main_deck = gameDeck()
         self.bonus_deck = gameBonusDeck()
         self.B7_card = self.main_deck.deck[[
@@ -23,9 +23,13 @@ class gameSetup:
         self.p_one_grid = [[0, 0, 0],
                            [0, 0, 0],
                            [0, 0, 0]]
-        self.turn = random.choice([0, 1])
+        if prebake_starter == -1:
+            self.turn = random.choice([0, 1])
+        else:
+            self.turn = prebake_starter
         self.p_zero_bonus_id = p_zero_bonus_id
         self.p_one_bonus_id = p_one_bonus_id
+        self.prebake_order = prebake_order
 
     def next_turn(self):
         if self.turn == 0:
@@ -34,7 +38,10 @@ class gameSetup:
             self.turn = 0
 
     def start_draft_phase(self):
-        self.main_deck.shuffle()
+        if self.prebake_order != []:
+            self.main_deck.arrange(self.prebake_order)
+        else:
+            self.main_deck.shuffle()
         self.bonus_deck.shuffle()
         for i in range(6):
             self.draft_options.append(self.main_deck.deal())

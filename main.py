@@ -14,17 +14,19 @@ import random
 
 
 class usurperGame:
-    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_bonus_id='',p_one_bonus_id=''):
+    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_bonus_id='',p_one_bonus_id='',prebake_order=[], prebake_starter=-1):
         self.p_zero_name = p_zero_name
         self.p_one_name = p_one_name
         self.p_zero_type = p_zero_type
         self.p_one_type = p_one_type
-        self.setup = gameSetup(p_zero_bonus_id,p_one_bonus_id)
+        self.setup = gameSetup(p_zero_bonus_id,p_one_bonus_id,prebake_order,prebake_starter)
         self.p_ai = [gameAI(0, p_zero_ai_level), gameAI(1, p_one_ai_level)]
 
     def mainLoop(self):
         print("Begin draft phase.")
         self.setup.start_draft_phase()
+
+        print([card.card_id for card in self.setup.main_deck.deck])
 
         self.p_ai[0].player_see_bonus(self.setup.p_zero_bonus[0])
         self.p_ai[1].player_see_bonus(self.setup.p_one_bonus[0])
@@ -166,5 +168,8 @@ class usurperGame:
         return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
 
 
-#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full')
+#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full',
+#                   'X3','X10',
+#                   ['Y11', 'G7', 'Y3', 'B7', 'R10', 'Y8', 'R9', 'G1', 'Y7', 'G9', 'R8', 'R1', 'G8', 'B3', 'R2', 'R4', 'B2', 'B8', 'B6', 'B10', 'Y2', 'G10', 'R7', 'R3' , 'R6', 'R5', 'R11', 'Y1', 'Y4' , 'G11'],
+#                   1)
 #game.mainLoop()

@@ -240,6 +240,12 @@ class gameDeck:
     def shuffle(self):
         random.shuffle(self.deck, random.random)
 
+    def arrange(self,order):
+        ordered = list(filter(lambda x: x.card_id in order, self.deck))
+        unordered = list(filter(lambda x: x.card_id not in order, self.deck))
+        ordered.sort(key=lambda x: order.index(x.card_id))
+        self.deck = ordered + unordered
+
     def deal(self):
         return self.deck.pop(0)
 

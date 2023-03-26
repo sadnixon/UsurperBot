@@ -204,7 +204,7 @@ class gameAI:
             for i in range(6):
                 if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
                     return i
-            return random.choice(range(6))
+            return 0
         elif self.mode == 'random':
             for i in range(6):
                 if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
@@ -304,7 +304,7 @@ class gameAI:
                                             break
                                         possible = False
                                         for k in range(9):
-                                            if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0:
+                                            if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0 and set([(k//3 , k%3), (i, j)]) != set([(2,0),(1,2)]):
                                                 possible = True
                                                 break
                                         if possible:
@@ -503,7 +503,6 @@ class gameAI:
                             else:
                                 best_g7_plan = {
                                     'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
-                        
                         if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
                             curr_mean = np.mean(all_scores)
                             curr_std = np.std(all_scores)
@@ -703,9 +702,9 @@ class gameAI:
             self.new_plan = True
             if self.mode == 'full':
                 # TODO UPDATE WITH DRAFTING WEIGHTS
-                return random.choice(range(4))
+                return 0
             elif self.mode == 'random':
-                return random.choice(range(4))
+                return 0
         elif instant_id == 'Y8':
             if self.mode == 'full':
                 if not test:
@@ -762,7 +761,7 @@ class gameAI:
                     for card_selection_x in range(3):
                         if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
                             return card_selection_x
-                    return random.choice(range(3))
+                    return 0
                         
             elif self.mode == 'random':
                 if len(setup.draft_options) == 0:
@@ -771,7 +770,7 @@ class gameAI:
                     for card_selection_x in range(3):
                         if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
                             return card_selection_x
-                    return random.choice(range(3))
+                    return 0
         elif instant_id == 'G7':
             if self.mode == 'full':
                 return self.g7_plan['decision'], self.g7_plan['move_x'], self.g7_plan['move_y'], self.g7_plan['target_x'], self.g7_plan['target_y']
