@@ -296,6 +296,7 @@ class gameAI:
                         g7_target_y = -1
                         g7_placement_x = -1
                         g7_placement_y = -1
+                        g7_move_options = []
                         for i in range(3):
                             if out_of_place == out_of_place_limit:
                                 break
@@ -309,7 +310,7 @@ class gameAI:
                                         for k in range(9):
                                             if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0 and set([(k//3 , k%3), (i, j)]) != set([(2,0),(1,2)]):
                                                 possible = True
-                                                break
+                                                g7_move_options.append(k//3,k%3)
                                         if possible:
                                             g7_card_id = order_distributor[0].card_id
                                             g7_target_x = i
@@ -325,7 +326,7 @@ class gameAI:
                                     test_grid[i][j] = order_distributor.pop(0)
                         if out_of_place == out_of_place_limit or pluses < pluses_floor:
                             continue
-                        if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y)):
+                        if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y) or (len(g7_move_options)==1 and g7_move_options[0] == (g7_placement_x,g7_placement_y))):
                             continue
 
                         valid_orders += 1
