@@ -263,6 +263,11 @@ class gameAI:
                     for i in range(open_spot_count-combo_length):
                         combo.append(N0.__copy__())
 
+                    grid_sum = 0
+                    for i in range(len(combo)):
+                        grid_sum += sum(
+                            [item != 0 for sublist in combo[i].placement_grid for item in sublist])
+
                     if sum([card.activation for card in combo]) > 0 and grid_sum > 54 and check_if_legal(player_grid,combo,True):
                         pluses_floor = 1
                     else:
@@ -285,10 +290,6 @@ class gameAI:
                         order_list = [card.__copy__() for card in order_list]
                         order_distributor = order_list.copy()
                         test_grid, _ = grid_deep_copy(player_grid)
-                        grid_sum = 0
-                        for i in range(len(order_list)):
-                            grid_sum += sum(
-                                [item != 0 for sublist in order_list[i].placement_grid for item in sublist])
                         
                         pluses = 0
                         g7_target_x = -1
