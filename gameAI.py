@@ -310,7 +310,7 @@ class gameAI:
                                         for k in range(9):
                                             if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0 and set([(k//3 , k%3), (i, j)]) != set([(2,0),(1,2)]):
                                                 possible = True
-                                                g7_move_options.append(k//3,k%3)
+                                                g7_move_options.append((k//3,k%3))
                                         if possible:
                                             g7_card_id = order_distributor[0].card_id
                                             g7_target_x = i
