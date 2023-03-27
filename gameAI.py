@@ -263,6 +263,11 @@ class gameAI:
                     for i in range(open_spot_count-combo_length):
                         combo.append(N0.__copy__())
 
+                    if sum([card.activation for card in combo]) > 0 and grid_sum > 54 and check_if_legal(player_grid,combo,True):
+                        pluses_floor = 1
+                    else:
+                        pluses_floor = 0
+
                     all_scores = []
                     all_orders = list(itertools.permutations(combo))
                     random.Random(4).shuffle(all_orders)
@@ -284,10 +289,7 @@ class gameAI:
                         for i in range(len(order_list)):
                             grid_sum += sum(
                                 [item != 0 for sublist in order_list[i].placement_grid for item in sublist])
-                        if sum([card.activation for card in order_list]) > 0 and grid_sum > 59:
-                            pluses_floor = 1
-                        else:
-                            pluses_floor = 0
+                        
                         pluses = 0
                         g7_target_x = -1
                         g7_target_y = -1

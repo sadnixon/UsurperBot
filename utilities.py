@@ -389,9 +389,9 @@ def print_card_list(card_list):
             list_of_lines.append([" "*15 for i in range(10)])
         else:
             list_of_lines.append(str(card).split("\n"))
-    if len(card_list) > 5:
-        list_of_lines_0 = list_of_lines[0:5]
-        list_of_lines_1 = list_of_lines[5:]
+    if len(card_list) > 6:
+        list_of_lines_0 = list_of_lines[0:6]
+        list_of_lines_1 = list_of_lines[6:]
         max_height_0 = max([len(card) for card in list_of_lines_0])
         max_height_1 = max([len(card) for card in list_of_lines_1])
         for i in range(len(list_of_lines_0)):
@@ -838,7 +838,7 @@ def check_possible_placement(player_grid,player_hand,single=False,hand_index=0):
     
     return possible
 
-def check_if_legal(player_grid,player_hand):
+def check_if_legal(player_grid,player_hand,activation_req=False):
     not_allowed = []
     for i in range(9):
         if player_grid[i//3][i%3] != 0:
@@ -864,12 +864,20 @@ def check_if_legal(player_grid,player_hand):
                 problem.addConstraint(constraint.NotInSetConstraint(not_allowed))
                 solution = problem.getSolution()
                 if solution:
-                    return True
+                    return True 
     
     problem = constraint.Problem(constraint.RecursiveBacktrackingSolver())
+    activation_pairs = []
     for card in player_hand:
         problem.addVariable(card.card_id,card.placement_indices)
-    problem.addConstraint(constraint.AllDifferentConstraint())
+        if activation_req and card.activation:
+            problem.addVariable(card.card_id+"_2",card.activation_indices)
+            activation_pairs.extend([card.card_id,card.card_id+"_2"])
+    problem.addConstraint(constraint.AllDifferentConstraint(),[card.card_id for card in player_hand])
+    if activation_req:
+        def at_least_one(*var_list):
+            return sum([var_list[i]==var_list[i+1] for i in range(len(var_list)//2)])>0
+        problem.addConstraint(at_least_one,activation_pairs)
     problem.addConstraint(constraint.NotInSetConstraint(not_allowed))
     solution = problem.getSolution()
     if solution:

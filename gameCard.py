@@ -25,11 +25,13 @@ class gameCard:
         self.instant = instant
         self.activation = False
         self.placement_indices = []
+        self.activation_indices = []
         for i in range(9):
             if self.placement_grid[i//3][i%3]>0:
                 self.placement_indices.append(i)
                 if self.placement_grid[i//3][i%3]==2:
                     self.activation = True
+                    self.activation_indices.append(i)
         self.text = text
         self.flipped = False
         self.g3_stored_data = {}
