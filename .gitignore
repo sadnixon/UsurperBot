@@ -7,3 +7,6 @@ orders_study.csv
 UsuerperBot-checkpoint.ipynb
 .ipynb_checkpoints
 __pycache__
+
+gameRender.py
+main_display.py

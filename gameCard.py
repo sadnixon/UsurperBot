@@ -1,3 +1,12 @@
+#import pygame
+
+#card_image_dict = {
+#    'R': [pygame.image.load('card_images/R'+str(i)+'.png') for i in range(1,12)],
+#    'G': [pygame.image.load('card_images/G'+str(i)+'.png') for i in range(1,12)],
+#    'B': [pygame.image.load('card_images/B'+str(i)+'.png') for i in range(1,12)],
+#    'Y': [pygame.image.load('card_images/Y'+str(i)+'.png') for i in range(1,12)]
+#}
+
 class gameCard:
     def __init__(self, name, card_id, base_points, color, hands, eyes, bags, placement_grid, instant, text, dummy=False):
         self.name = name
@@ -36,6 +45,8 @@ class gameCard:
         self.flipped = False
         self.g3_stored_data = {}
         self.dummy = dummy
+        #if color in ['R','G','Y','B']:
+        #    self.image = card_image_dict[color][int(card_id[1])-1]
 
     def __str__(self):
         if self.flipped:
