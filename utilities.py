@@ -603,6 +603,8 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print("Both players draw a card!")
         setup.draw(player)
         setup.draw(opponent)
+        player_ai.new_plan = True
+        opp_ai.new_plan = True
     elif instant_id == 'R10':
         for i in range(4):
             setup.deal_temp()
