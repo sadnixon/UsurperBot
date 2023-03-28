@@ -43,7 +43,6 @@ class gameAI:
         self.last_cpy_order = []
         self.g7_plan = {'decision': 'n', 'move_x': -1,
                         'move_y': -1, 'target_x': -1, 'target_y': -1}
-        self.flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
         self.new_plan = True
 
     def player_see_card(self, card):
@@ -240,7 +239,6 @@ class gameAI:
             best_next_card_name = ''
             best_cpx_order = []
             best_cpy_order = []
-            best_flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
 
             player_fill_dict, player_fill_card = self.average_card(True)
             opponent_fill_dict, opponent_fill_card = self.average_card()
@@ -412,7 +410,6 @@ class gameAI:
                         test_setup.max_unknown = self.max_unknown
                         test_setup.possible_bonus_cards = self.possible_opp_bonus_cards.copy()
                         self.last_plan, _ = grid_deep_copy(test_grid)
-                        self.flip_ids = [['', '', ''], ['', '', ''], ['', '', '']]
 
                         if self.player_num == 0:
                             test_setup.p_zero_grid, _ = grid_deep_copy(player_grid)
@@ -500,7 +497,6 @@ class gameAI:
                             best_next_card_name = sorted_order[0].name
                             best_cpx_order = cpx_list
                             best_cpy_order = cpy_list
-                            best_flip_ids = self.flip_ids.copy()
                             if g7_bloc != [0, 0]:
                                 best_g7_plan = {'decision': 'y', 'move_x': g7_move_x,
                                                 'move_y': g7_move_y, 'target_x': g7_target_x, 'target_y': g7_target_y}
@@ -529,7 +525,6 @@ class gameAI:
             self.g7_plan = best_g7_plan
             self.last_cpx_order = best_cpx_order
             self.last_cpy_order = best_cpy_order
-            self.flip_ids = best_flip_ids
             self.new_plan = False
 
             card_selection_index = [
@@ -593,12 +588,6 @@ class gameAI:
                 return card_placement_x, card_placement_y
         elif instant_id == 'R4':
             if self.mode == 'full':
-                if not test:
-                    for x in range(3):
-                        for y in range(3):
-                            if self.flip_ids[x][y] == instant_id:
-                                return 'y', x, y
-                    return 'n', -1, -1
                 opponent_fill_dict, opponent_fill_card = self.average_card()
                 card_placement_x = -1
                 card_placement_y = -1
@@ -610,6 +599,7 @@ class gameAI:
                     for y in range(3):
                         if player_grid[x][y] != 0:
                             test_grid, _ = grid_deep_copy(self.last_plan)
+                            test_grid[x][y] = player_grid[x][y].__copy__()
                             test_grid[x][y].flip()
                             player_score_xy = evaluation(
                                 test_grid, opponent_grid, player_bonus, opponent_fill_dict, opponent_fill_card)
@@ -619,8 +609,6 @@ class gameAI:
                                 best = player_score_xy
                                 card_placement_x = x
                                 card_placement_y = y
-                if decision == 'y':
-                    self.flip_ids[card_placement_x][card_placement_y] = instant_id
                 return decision, card_placement_x, card_placement_y
             elif self.mode == 'random':
                 decision = random.choice(['y', 'n'])
@@ -712,17 +700,13 @@ class gameAI:
                 return 0
         elif instant_id == 'Y8':
             if self.mode == 'full':
-                if not test:
-                    if self.flip_ids[i][j] == instant_id:
-                        return 'y'
-                    else:
-                        return 'n'
                 test_grid, _ = grid_deep_copy(self.last_plan)
                 player_score_n = evaluation(
                     test_grid, opponent_grid, player_bonus)
                 opp_score_n = evaluation(
                     opponent_grid, test_grid, self.possible_opp_bonus_cards)
                 n_avg = player_score_n - opp_score_n
+                test_grid[i][j] = player_grid[i][j].__copy__()
                 test_grid[i][j].flip()
                 player_score_y = evaluation(
                     test_grid, opponent_grid, player_bonus)
@@ -730,7 +714,6 @@ class gameAI:
                     opponent_grid, test_grid, self.possible_opp_bonus_cards)
                 y_avg = player_score_y - opp_score_y
                 if y_avg > n_avg:
-                    self.flip_ids[i][j] == instant_id
                     return 'y'
                 else:
                     return 'n'
@@ -826,11 +809,6 @@ class gameAI:
                 return random.choice(['y', 'n'])
         elif pre_score_id == 'G5':
             if self.mode == 'full':
-                if not test and self.player_num == setup.turn:
-                    if self.flip_ids[i][j] == pre_score_id:
-                        return 'y'
-                    else:
-                        return 'n'
                 test_grid, _ = grid_deep_copy(player_grid)
                 player_score_n = evaluation(
                     test_grid, opponent_grid, player_bonus)
@@ -844,8 +822,6 @@ class gameAI:
                     opponent_grid, test_grid, self.possible_opp_bonus_cards)
                 y_avg = player_score_y - opp_score_y
                 if y_avg > n_avg:
-                    if self.player_num == setup.turn:
-                        self.flip_ids[i][j] = pre_score_id
                     return 'y'
                 else:
                     return 'n'
@@ -853,11 +829,6 @@ class gameAI:
                 return random.choice(['y', 'n'])
         elif pre_score_id == 'G6':
             if self.mode == 'full':
-                if not test and self.player_num == setup.turn:
-                    if self.flip_ids[i+1][j] == pre_score_id:
-                        return 'y'
-                    else:
-                        return 'n'
                 test_grid, _ = grid_deep_copy(player_grid)
                 player_score_n = evaluation(
                     test_grid, opponent_grid, player_bonus)
@@ -871,8 +842,6 @@ class gameAI:
                     opponent_grid, test_grid, self.possible_opp_bonus_cards)
                 y_avg = player_score_y - opp_score_y
                 if y_avg > n_avg:
-                    if self.player_num == setup.turn:
-                        self.flip_ids[i][j] = pre_score_id
                     return 'y'
                 else:
                     return 'n'
