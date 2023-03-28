@@ -562,23 +562,29 @@ class gameAI:
             if self.mode == 'full':
                 replacement_dict, replacement_card = self.average_card(True)
                 opponent_fill_dict, opponent_fill_card = self.average_card()
-                card_placement_x = -1
-                card_placement_y = -1
+                replacement_x = -1
+                replacement_y = -1
                 best = 0
+                found = False
                 for x in range(3):
                     for y in range(3):
                         if player_grid[x][y] != 0:
                             test_grid, _ = grid_deep_copy(self.last_plan)
-                            if test_grid[x][y].name != player_grid[x][y].name:
-                                continue
+                            if test_grid[x][y].name != player_grid[x][y].name and not test:
+                                replacement_x = x
+                                replacement_y = y
+                                found = True
+                                break
                             test_grid[x][y] = replacement_card
                             player_score_xy = evaluation(
                                 test_grid, opponent_grid, player_bonus, opponent_fill_dict, opponent_fill_card, replacement_dict)
                             if player_score_xy > best:
                                 best = player_score_xy
-                                card_placement_x = x
-                                card_placement_y = y
-                return card_placement_x, card_placement_y
+                                replacement_x = x
+                                replacement_y = y
+                    if found:
+                        break
+                return replacement_x, replacement_y
             elif self.mode == 'random':
                 card_placement_x = -1
                 card_placement_y = -1
@@ -630,10 +636,17 @@ class gameAI:
                 best = evaluation(self.last_plan, opponent_grid,
                                   player_bonus, opponent_fill_dict, opponent_fill_card)
                 decision = 'n'
+                found = False
                 for x in range(3):
                     for y in range(3):
                         if player_grid[x][y] != 0:
                             test_grid, _ = grid_deep_copy(self.last_plan)
+                            if test_grid[x][y].name != player_grid[x][y].name and not test:
+                                replacement_x = x
+                                replacement_y = y
+                                decision = 'y'
+                                found = True
+                                break
                             test_grid[x][y] = replacement_card
                             player_score_xy = evaluation(
                                 test_grid, opponent_grid, player_bonus, opponent_fill_dict, opponent_fill_card, replacement_dict)
@@ -643,6 +656,8 @@ class gameAI:
                                 best = player_score_xy
                                 replacement_x = x
                                 replacement_y = y
+                    if found:
+                        break
                 return decision, replacement_x, replacement_y
             elif self.mode == 'random':
                 decision = random.choice(['y', 'n'])
