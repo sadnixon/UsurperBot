@@ -250,8 +250,8 @@ for i in range(x):
             if p_one_grid[j//3][j%3] != 0:
                 if p_one_grid[j//3][j%3].card_id not in ['A0','dA0','N0']:
                     if p_one_grid[j//3][j%3].g3_stored_data != {}:
-                        PR[combo_list[0]][p_one_grid[j//3][j%3].g3_stored_data['card_id']] += p_one_indivs[j]
-                        PRI[combo_list[0]][p_one_grid[j//3][j%3].g3_stored_data['card_id']] += 1
+                        PR[combo_list[1]][p_one_grid[j//3][j%3].g3_stored_data['card_id']] += p_one_indivs[j]
+                        PRI[combo_list[1]][p_one_grid[j//3][j%3].g3_stored_data['card_id']] += 1
                     else:
                         PR[combo_list[1]][p_one_grid[j//3][j%3].card_id] += p_one_indivs[j]
                         PRI[combo_list[1]][p_one_grid[j//3][j%3].card_id] += 1
