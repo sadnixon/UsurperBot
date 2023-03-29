@@ -921,7 +921,7 @@ def combo_narrower(player_grid,player_hand):
                 if key+'_'+str(item.og_base_points) not in distincts:
                     distincts[key+'_'+str(item.og_base_points)] = [item]
                 else:
-                    distincts[key+'_'+str(item.og_base_points)] = distincts[key+'_'+str(item[0].og_base_points)] + [item]
+                    distincts[key+'_'+str(item.og_base_points)] = distincts[key+'_'+str(item.og_base_points)] + [item]
 
     if 'G10' in all_ids:
         for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
