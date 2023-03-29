@@ -9,10 +9,12 @@ from utilities import check_if_legal
 from utilities import grid_deep_copy
 from utilities import execute_instant
 from utilities import execute_pre_scoring
+from utilities import combo_narrower
 import random
 import numpy as np
 import itertools
 import scipy.stats
+import copy
 
 instant_priority = {'Y5': 0, 'G4': 1, 'R10': 2, 'R9': 3,
                     'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8,'N0': 9}
@@ -271,15 +273,28 @@ class gameAI:
                     else:
                         pluses_floor = 0
 
-                    all_scores = []
-                    all_orders = list(itertools.permutations(combo))
+                    dist_dict, dist_keys = combo_narrower(player_grid,combo)
+                    if dist_dict:
+                        all_orders = list(set(itertools.permutations(dist_keys)))
+                    else:
+                        all_orders = list(itertools.permutations(combo))
+                    
                     random.Random(4).shuffle(all_orders)
+                    all_scores = []
                     num_orders = len(all_orders)
                     tested_orders = 0
                     valid_orders = 0
                     for order in all_orders:
                         tested_orders += 1
-                        order_list = list(order)
+
+                        if dist_dict:
+                            dist_dict_copy = copy.deepcopy(dist_dict)
+                            order_list = []
+                            for d_key in order:
+                                order_list.append(dist_dict_copy[d_key].pop(0))
+                        else:
+                            order_list = list(order)
+                        
                         out_of_place = 0
                         if 'G7' in [card.card_id for card in order_list] and open_spot_count>2 and (master_test_grid[1][2] == 0 or master_test_grid[2][0] == 0):
                             out_of_place_limit = 2

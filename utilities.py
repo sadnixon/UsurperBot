@@ -886,3 +886,102 @@ def check_if_legal(player_grid,player_hand,activation_req=False):
         return True
     else:
         return False
+    
+def combo_narrower(player_grid,player_hand):
+    special_cards = ['R3','G6','G10','R6','Y4','B6','G2','Y7','B3','Y6','B11','G8','G11']
+    distincts = {}
+    def grid_string(grid):
+        return ''.join([str(item) for sublist in grid for item in sublist])
+    
+    existing_ids = []
+    for i in range(len(player_hand)):
+        adjusted_string = grid_string(player_hand[i].placement_grid)
+        for j in range(9):
+            if player_grid[j//3][j%3] != 0:
+                adjusted_string = adjusted_string[:j]+"0"+adjusted_string[j+1:]
+                if i==0:
+                    existing_ids.append(player_grid[j//3][j%3].card_id)
+        if player_hand[i].card_id in special_cards:
+            distincts[player_hand[i].card_id] = [player_hand[i]]
+        else:
+            if adjusted_string not in distincts:
+                distincts[grid_string(adjusted_string)] = [player_hand[i]]
+            else:
+                distincts[grid_string(adjusted_string)] = distincts[adjusted_string] + [player_hand[i]]
+    
+    hand_ids = [card.card_id for card in player_hand]
+    all_ids = existing_ids + hand_ids
+    if 'G3' in all_ids or len(distincts.keys()) == len(player_hand):
+        return False, False
+    
+    if 'R3' in all_ids or 'G6' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            for item in group:
+                if key+'_'+str(item.og_base_points) not in distincts:
+                    distincts[key+'_'+str(item.og_base_points)] = [item]
+                else:
+                    distincts[key+'_'+str(item.og_base_points)] = distincts[key+'_'+str(item[0].og_base_points)] + [item]
+
+    if 'G10' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_R']  = list(filter(lambda x: x.color=='R', group))
+            distincts[key+'_G']  = list(filter(lambda x: x.color=='G', group))
+            distincts[key+'_nRG']  = list(filter(lambda x: x.color not in ['G','R'], group))
+    elif 'R6' in all_ids or 'Y4' in all_ids or 'B6' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_R']  = list(filter(lambda x: x.color=='R', group))
+            distincts[key+'_nR']  = list(filter(lambda x: x.color != 'R', group))
+    elif 'G2' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_RG']  = list(filter(lambda x: x.color in ['G','R'], group))
+            distincts[key+'_nRG']  = list(filter(lambda x: x.color not in ['G','R'], group))
+
+    if 'Y7' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_Y']  = list(filter(lambda x: x.color=='Y', group))
+            distincts[key+'_nY']  = list(filter(lambda x: x.color != 'Y', group))
+    if 'B3' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_B']  = list(filter(lambda x: x.color=='B', group))
+            distincts[key+'_nB']  = list(filter(lambda x: x.color != 'B', group))
+    elif 'Y6' in all_ids and 'Y7' not in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            distincts[key+'_BY']  = list(filter(lambda x: x.color in ['B','Y'], group))
+            distincts[key+'_nBY']  = list(filter(lambda x: x.color not in ['B','Y'], group))
+            
+    if 'B11' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            for item in group:
+                if key+'_'+str(item.hands) not in distincts:
+                    distincts[key+'_'+str(item.hands)] = [item]
+                else:
+                    distincts[key+'_'+str(item.hands)] = distincts[key+'_'+str(item.hands)] + [item]
+
+    if 'G8' in all_ids:
+        for key in list(filter(lambda x: x not in special_cards,distincts.keys())):
+            group = distincts.pop(key)
+            for item in group:
+                if key+'_'+str(item.eyes) not in distincts:
+                    distincts[key+'_'+str(item.eyes)] = [item]
+                else:
+                    distincts[key+'_'+str(item.eyes)] = distincts[key+'_'+str(item.eyes)] + [item]
+    
+    key_correspondance = []
+    for key in list(distincts.keys()):
+        if distincts[key] == []:
+            distincts.pop(key)
+        else:
+            for item in distincts[key]:
+                key_correspondance.append(key)
+    if len(distincts.keys()) == len(player_hand):
+        return False, False
+    else:
+        return distincts, key_correspondance
