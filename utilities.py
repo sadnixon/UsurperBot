@@ -5,13 +5,13 @@ from gameDeck import gameDeck
 from gameSetup import gameSetup
 import constraint
 
-pair_list = []
-for i in range(2):
-    for j in range(3):
-        pair_list.append(((i, j), (i+1, j)))
-for i in range(3):
-    for j in range(2):
-        pair_list.append(((i, j), (i, j+1)))
+#pair_list = []
+#for i in range(2):
+#    for j in range(3):
+#        pair_list.append(((i, j), (i+1, j)))
+#for i in range(3):
+#    for j in range(2):
+#        pair_list.append(((i, j), (i, j+1)))
 
 N0 = gameCard('dummy', 'N0', 0, '', 0, 0, 0,
               [[1, 1, 1],
@@ -221,9 +221,13 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
                     hands_sum = sum(flat_grid)
                     current_card.changepoints(hands_sum)
                 elif current_id == 'G10':
-                    for pair in pair_list:
-                        if set([player_grid[pair[0][0]][pair[0][1]].color, player_grid[pair[1][0]][pair[1][1]].color]) == {'R', 'G'}:
-                            current_card.changepoints(3)
+                    flat_grid = [item.color == 'R' for sublist in player_grid for item in sublist]
+                    flat_grid_2 = [item.color == 'G' for sublist in player_grid for item in sublist]
+                    gr_pairs_sum = min(sum(flat_grid),sum(flat_grid_2))
+                    current_card.changepoints(gr_pairs_sum)
+                    #for pair in pair_list:
+                    #    if set([player_grid[pair[0][0]][pair[0][1]].color, player_grid[pair[1][0]][pair[1][1]].color]) == {'R', 'G'}:
+                    #        current_card.changepoints(3)
                 else:
                     pass
             else:
@@ -348,9 +352,13 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
             else:
                 bonus_points += 6
         elif bonus_id == 'X10':
-            for pair in pair_list:
-                if set([player_grid[pair[0][0]][pair[0][1]].color, player_grid[pair[1][0]][pair[1][1]].color]) == {'B', 'Y'}:
-                    bonus_points += 4
+            flat_grid = [item.color == 'B' for sublist in player_grid for item in sublist]
+            flat_grid_2 = [item.color == 'Y' for sublist in player_grid for item in sublist]
+            by_pairs_sum = min(sum(flat_grid),sum(flat_grid_2))
+            bonus_points += by_pairs_sum*4
+            #for pair in pair_list:
+            #    if set([player_grid[pair[0][0]][pair[0][1]].color, player_grid[pair[1][0]][pair[1][1]].color]) == {'B', 'Y'}:
+            #        bonus_points += 4
 
     done = False
     for i in range(3):
@@ -590,7 +598,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
         if human:
             flip_x = -1
             flip_y = -1
-            while (not (flip_x in range(3) and flip_y in range(3))) or player_grid[flip_x][flip_y] == 0:
+            while (not (flip_x in range(3) and flip_y in range(3))) or opponent_grid[flip_x][flip_y] == 0:
                 print("Input valid coords from 0 to 2")
                 flip_x = int(input())
                 flip_y = int(input())

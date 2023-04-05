@@ -10,7 +10,6 @@ from utilities import execute_instant
 from utilities import execute_pre_scoring
 from utilities import check_possible_placement
 from utilities import grid_deep_copy
-import random
 
 
 class usurperGame:
