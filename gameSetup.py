@@ -3,10 +3,11 @@ from gameDeck import gameDeck
 from gameBonus import gameBonus
 from gameBonusDeck import gameBonusDeck
 import random
+import pygame
 
 
 class gameSetup:
-    def __init__(self, p_zero_bonus_id='', p_one_bonus_id='', prebake_order=[], prebake_starter=-1):
+    def __init__(self, p_zero_bonus_id='', p_one_bonus_id='', prebake_order=[], prebake_starter=-1, test=False):
         self.main_deck = gameDeck()
         self.bonus_deck = gameBonusDeck()
         self.B7_card = self.main_deck.deck[[
@@ -30,6 +31,50 @@ class gameSetup:
         self.p_zero_bonus_id = p_zero_bonus_id
         self.p_one_bonus_id = p_one_bonus_id
         self.prebake_order = prebake_order
+
+        if not test:
+            self.master_card_image_dict = {
+                'R': [pygame.image.load('hq_card_images/R'+str(i)+'.png') for i in range(1,12)],
+                'G': [pygame.image.load('hq_card_images/G'+str(i)+'.png') for i in range(1,12)],
+                'B': [pygame.image.load('hq_card_images/B'+str(i)+'.png') for i in range(1,12)],
+                'Y': [pygame.image.load('hq_card_images/Y'+str(i)+'.png') for i in range(1,12)],
+                'X': [pygame.image.load('hq_card_images/X'+str(i)+'.png') for i in range(1,11)]
+            }
+
+            self.master_card_back = pygame.image.load('hq_card_images/card_back.png')
+            self.master_bonus_back = pygame.image.load('hq_card_images/card_back_bonus.png')
+
+            self.card_image_dict = {
+                'R': [pygame.image.load('hq_card_images/R'+str(i)+'.png') for i in range(1,12)],
+                'G': [pygame.image.load('hq_card_images/G'+str(i)+'.png') for i in range(1,12)],
+                'B': [pygame.image.load('hq_card_images/B'+str(i)+'.png') for i in range(1,12)],
+                'Y': [pygame.image.load('hq_card_images/Y'+str(i)+'.png') for i in range(1,12)],
+                'X': [pygame.image.load('hq_card_images/X'+str(i)+'.png') for i in range(1,11)]
+            }
+
+            self.card_back = pygame.image.load('hq_card_images/card_back.png')
+            self.bonus_back = pygame.image.load('hq_card_images/card_back_bonus.png')
+
+    def set_card_sizes(self,screen_width,screen_height,game_width,game_height,draft=True):
+        if  game_width/game_height < screen_width/screen_height:
+            max_surface_x = round(screen_height*(game_width/game_height))
+            max_surface_y = screen_height
+        else:
+            max_surface_x = screen_width
+            max_surface_y = round(screen_width*(game_height/game_width))
+        
+        if draft:
+            card_x = round(max_surface_x * 1/10)
+            card_y = round(max_surface_y * 1/4)
+        else:
+            card_x = round(max_surface_x * 2/21)
+            card_y = round(max_surface_y * 4/17)
+
+        for i in range(len(list(self.card_image_dict.keys()))):
+            for j in range(len(self.card_image_dict[list(self.card_image_dict.keys())[i]])):
+                self.card_image_dict[list(self.card_image_dict.keys())[i]][j] = pygame.transform.smoothscale(self.master_card_image_dict[list(self.card_image_dict.keys())[i]][j],(card_x,card_y))
+        self.card_back = pygame.transform.smoothscale(self.master_card_back,(card_x,card_y))
+        self.bonus_back = pygame.transform.smoothscale(self.master_bonus_back,(card_x,card_y))
 
     def next_turn(self):
         if self.turn == 0:

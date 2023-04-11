@@ -7,8 +7,8 @@ from utilities import evaluation
 from utilities import check_possible_placement
 from utilities import check_if_legal
 from utilities import grid_deep_copy
-from utilities import execute_instant
-from utilities import execute_pre_scoring
+from action_utilities import execute_instant
+from action_utilities import execute_pre_scoring
 from utilities import combo_narrower
 import random
 import numpy as np
@@ -415,7 +415,7 @@ class gameAI:
                         # print_card_list(test_grid[0])
                         # print_card_list(test_grid[1])
                         # print_card_list(test_grid[2])
-                        test_setup = gameSetup()
+                        test_setup = gameSetup(test=True)
                         test_setup.main_deck.deck = []
                         for i in range(len(setup.main_deck.deck)):
                             test_setup.main_deck.deck.append(
