@@ -32,12 +32,15 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print_card_list(player_grid[2])
             print(f"{player_name}, select a card to discard and replace from the deck")
         if human:
-            replacement_x = -1
-            replacement_y = -1
-            while (not (replacement_x in range(3) and replacement_y in range(3))) or player_grid[replacement_x][replacement_y] == 0:
-                print("Input valid coords from 0 to 2")
-                replacement_x = int(input())
-                replacement_y = int(input())
+            if display:
+                replacement_x, replacement_y = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                replacement_x = -1
+                replacement_y = -1
+                while (not (replacement_x in range(3) and replacement_y in range(3))) or player_grid[replacement_x][replacement_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    replacement_x = int(input())
+                    replacement_y = int(input())
         else:
             replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(player, replacement_x, replacement_y)
@@ -46,7 +49,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
         opp_ai.deck_to_board(player_grid[replacement_x][replacement_y])
 
         if player_grid[replacement_x][replacement_y].instant:
-            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
+            execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test, display = display, screen = screen, game_width = game_width, game_height = game_height)
 
         if opponent_grid == [[0,0,0],[0,0,0],[0,0,0]]:
             return print(f"{opponent_name} has no cards to replace!")
@@ -57,12 +60,15 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print_card_list(opponent_grid[2])
             print(f"{opponent_name}, select a card to discard and replace from the deck")
         if opp_human:
-            replacement_x = -1
-            replacement_y = -1
-            while (not (replacement_x in range(3) and replacement_y in range(3))) or opponent_grid[replacement_x][replacement_y] == 0:
-                print("Input valid coords from 0 to 2")
-                replacement_x = int(input())
-                replacement_y = int(input())
+            if display:
+                replacement_x, replacement_y = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                replacement_x = -1
+                replacement_y = -1
+                while (not (replacement_x in range(3) and replacement_y in range(3))) or opponent_grid[replacement_x][replacement_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    replacement_x = int(input())
+                    replacement_y = int(input())
         else:
             replacement_x, replacement_y = opp_ai.instant_decision(setup, instant_id,test=test)
         setup.replace(opponent, replacement_x, replacement_y)
@@ -71,7 +77,7 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
         opp_ai.deck_to_board(opponent_grid[replacement_x][replacement_y])
 
         if opponent_grid[replacement_x][replacement_y].instant:
-            execute_instant(setup, opponent, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test)
+            execute_instant(setup, opponent, ai, p_zero_name, p_one_name, p_zero_type, p_one_type, replacement_x, replacement_y, test=test, display = display, screen = screen, game_width = game_width, game_height = game_height)
 
     elif instant_id == 'R4':
         if pos_x == 1 or pos_y != 1:
@@ -90,13 +96,16 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                     decision = input()
             if decision == 'n':
                 return
-            print(f"{player_name}, select a card to flip")
-            flip_x = -1
-            flip_y = -1
-            while (not (flip_x in range(3) and flip_y in range(3))) or player_grid[flip_x][flip_y] == 0:
-                print("Input valid coords from 0 to 2")
-                flip_x = int(input())
-                flip_y = int(input())
+            if display:
+                flip_x,flip_y = input_waiter_flip(screen,setup,game_width,game_height,instant_id)
+            else:
+                print(f"{player_name}, select a card to flip")
+                flip_x = -1
+                flip_y = -1
+                while (not (flip_x in range(3) and flip_y in range(3))) or player_grid[flip_x][flip_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    flip_x = int(input())
+                    flip_y = int(input())
         else:
             decision, flip_x, flip_y = player_ai.instant_decision(setup, instant_id,test=test)
             if decision == 'n':
@@ -120,14 +129,17 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                     decision = input()
             if decision == 'n':
                 return
-            print(
-                f"{player_name}, select a card to discard and replace from the deck")
-            replacement_x = -1
-            replacement_y = -1
-            while (not (replacement_x in range(3) and replacement_y in range(3))) or player_grid[replacement_x][replacement_y] == 0:
-                print("Input valid coords from 0 to 2")
-                replacement_x = int(input())
-                replacement_y = int(input())
+            if display:
+                replacement_x, replacement_y = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                print(
+                    f"{player_name}, select a card to discard and replace from the deck")
+                replacement_x = -1
+                replacement_y = -1
+                while (not (replacement_x in range(3) and replacement_y in range(3))) or player_grid[replacement_x][replacement_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    replacement_x = int(input())
+                    replacement_y = int(input())
         else:
             decision, replacement_x, replacement_y = player_ai.instant_decision(setup, instant_id,test=test)
             if decision == 'n':
@@ -153,12 +165,15 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print_card_list(opponent_grid[2])
             print(f"{player_name}, select a card from your opponent's grid to flip")
         if human:
-            flip_x = -1
-            flip_y = -1
-            while (not (flip_x in range(3) and flip_y in range(3))) or opponent_grid[flip_x][flip_y] == 0:
-                print("Input valid coords from 0 to 2")
-                flip_x = int(input())
-                flip_y = int(input())
+            if display:
+                flip_x,flip_y = input_waiter_flip(screen,setup,game_width,game_height,instant_id)
+            else:
+                flip_x = -1
+                flip_y = -1
+                while (not (flip_x in range(3) and flip_y in range(3))) or opponent_grid[flip_x][flip_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    flip_x = int(input())
+                    flip_y = int(input())
         else:
             flip_x, flip_y = player_ai.instant_decision(setup, instant_id,test=test)
         setup.flip_card(opponent, flip_x, flip_y)
@@ -178,11 +193,14 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print(
                 f"{player_name}, select a card to draw into your hand (the rest will be discarded)")
         if human:
-            print_card_list(setup.draft_options)
-            selection_x = -1
-            while not selection_x in range(4):
-                print("Input valid index from 0 to 3")
-                selection_x = int(input())
+            if display:
+                selection_x, _ = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                print_card_list(setup.draft_options)
+                selection_x = -1
+                while not selection_x in range(4):
+                    print("Input valid index from 0 to 3")
+                    selection_x = int(input())
         else:
             selection_x = player_ai.instant_decision(setup, instant_id,test=test)
         setup.draft_temp(selection_x, player)
@@ -238,11 +256,14 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
         if not test:
             print(f"{player_name}, select a card to discard")
         if human:
-            print_card_list(player_hand)
-            selection_x = -1
-            while not selection_x in range(len(player_hand)):
-                print(f"Input valid index from 0 to {len(player_hand)-1}")
-                selection_x = int(input())
+            if display:
+                selection_x, _ = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                print_card_list(player_hand)
+                selection_x = -1
+                while not selection_x in range(len(player_hand)):
+                    print(f"Input valid index from 0 to {len(player_hand)-1}")
+                    selection_x = int(input())
         else:
             selection_x = player_ai.instant_decision(setup,instant_id,test=test)
         setup.discard(player, 'hand', selection_x, 0)
@@ -254,11 +275,14 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             print(
                 f"{player_name}, select a card to draw into your hand (the rest will be discarded)")
         if human:
-            print_card_list(setup.draft_options)
-            selection_x = -1
-            while not selection_x in range(3):
-                print("Input valid index from 0 to 2")
-                selection_x = int(input())
+            if display:
+                selection_x, _ = input_waiter_draw_discard(screen,setup,game_width,game_height,instant_id)
+            else:
+                print_card_list(setup.draft_options)
+                selection_x = -1
+                while not selection_x in range(3):
+                    print("Input valid index from 0 to 2")
+                    selection_x = int(input())
         else:
             selection_x = player_ai.instant_decision(setup,instant_id,test=test)
         setup.draft_temp(selection_x, player)
@@ -284,20 +308,23 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
                     decision = input()
             if decision == 'n':
                 return
-            print(f"{player_name}, select a card to move")
-            move_x = -1
-            move_y = -1
-            while (not (move_x in range(3) and move_y in range(3))) or player_grid[move_x][move_y] == 0:
-                print("Input valid coords from 0 to 2")
-                move_x = int(input())
-                move_y = int(input())
-            print(f"{player_name}, select a destination")
-            target_x = -1
-            target_y = -1
-            while (not (target_x in range(3) and target_y in range(3))) or player_grid[target_x][target_y] != 0:
-                print("Input valid coords from 0 to 2")
-                target_x = int(input())
-                target_y = int(input())
+            if display:
+                move_x,move_y,target_x,target_y = input_waiter_g7(screen,setup,game_width,game_height)
+            else:
+                print(f"{player_name}, select a card to move")
+                move_x = -1
+                move_y = -1
+                while (not (move_x in range(3) and move_y in range(3))) or player_grid[move_x][move_y] == 0:
+                    print("Input valid coords from 0 to 2")
+                    move_x = int(input())
+                    move_y = int(input())
+                print(f"{player_name}, select a destination")
+                target_x = -1
+                target_y = -1
+                while (not (target_x in range(3) and target_y in range(3))) or player_grid[target_x][target_y] != 0:
+                    print("Input valid coords from 0 to 2")
+                    target_x = int(input())
+                    target_y = int(input())
         else:
             decision, move_x, move_y, target_x, target_y = player_ai.instant_decision(setup,instant_id,test=test)
             if decision == 'n':

@@ -55,7 +55,7 @@ class gameSetup:
             self.card_back = pygame.image.load('hq_card_images/card_back.png')
             self.bonus_back = pygame.image.load('hq_card_images/card_back_bonus.png')
 
-    def set_card_sizes(self,screen_width,screen_height,game_width,game_height,draft=True):
+    def set_card_sizes(self,screen_width,screen_height,game_width,game_height,draft=False,results=False):
         if  game_width/game_height < screen_width/screen_height:
             max_surface_x = round(screen_height*(game_width/game_height))
             max_surface_y = screen_height
@@ -65,6 +65,9 @@ class gameSetup:
         
         if draft:
             card_x = round(max_surface_x * 1/10)
+            card_y = round(max_surface_y * 1/4)
+        elif results:
+            card_x = round(max_surface_x * 1/9)
             card_y = round(max_surface_y * 1/4)
         else:
             card_x = round(max_surface_x * 2/21)

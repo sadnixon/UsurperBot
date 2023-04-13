@@ -191,9 +191,20 @@ class usurperGame:
             print(f"{self.p_one_name} WINS!")
         else:
             print("IT'S A PERFECT TIE!")
-        
-        return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
+
+        screen_height = screen.get_height()
+        screen_width = screen.get_width()
+        game_height, game_width = 4240, 6804
+        self.setup.set_card_sizes(screen_width,screen_height,game_width,game_height,results=True)
+        restart = input_waiter_results(screen,self.setup,game_width,game_height,self.p_zero_name,self.p_one_name,p_zero_score,p_one_score,p_zero_bonus_score,p_one_bonus_score)
+
+        #return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
+        return restart
 
 
-game = usurperGame("UsurperBot1", "UsurperBot2", 'Human', 'AI','full','full',prebake_starter = 0)
-game.mainLoop()
+start_game = True
+while start_game:
+    game = usurperGame("UsurperBot1", "UsurperBot2", 'Human', 'AI','full','full',prebake_starter = 0)
+    restart = game.mainLoop()
+    if restart == 'n':
+        start_game = False
