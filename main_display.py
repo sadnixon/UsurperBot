@@ -28,13 +28,13 @@ keys_to_coords = {113:(0,0),
 99:(2,2)}
 
 class usurperGame:
-    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_bonus_id='',p_one_bonus_id='',prebake_order=[], prebake_starter=-1):
+    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_ai_draft_level='random',p_one_ai_draft_level='random',p_zero_bonus_id='',p_one_bonus_id='',prebake_order=[], prebake_starter=-1):
         self.p_zero_name = p_zero_name
         self.p_one_name = p_one_name
         self.p_zero_type = p_zero_type
         self.p_one_type = p_one_type
         self.setup = gameSetup(p_zero_bonus_id,p_one_bonus_id,prebake_order,prebake_starter)
-        self.p_ai = [gameAI(0, p_zero_ai_level,True), gameAI(1, p_one_ai_level,True)]
+        self.p_ai = [gameAI(0, p_zero_ai_level,p_zero_ai_draft_level,True), gameAI(1, p_one_ai_level,p_one_ai_draft_level,True)]
 
     def mainLoop(self):
         print("Begin draft phase.")
@@ -204,7 +204,7 @@ class usurperGame:
 
 start_game = True
 while start_game:
-    game = usurperGame("UsurperBot1", "UsurperBot2", 'Human', 'AI','full','full',prebake_starter = 0)
+    game = usurperGame("Spencer", "UsurperBot2", 'Human', 'AI','full','full','overall_pair_averages','overall_pair_averages',prebake_starter = 0)
     restart = game.mainLoop()
     if restart == 'n':
         start_game = False

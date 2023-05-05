@@ -13,13 +13,13 @@ from utilities import grid_deep_copy
 
 
 class usurperGame:
-    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_bonus_id='',p_one_bonus_id='',prebake_order=[], prebake_starter=-1):
+    def __init__(self, p_zero_name, p_one_name, p_zero_type, p_one_type, p_zero_ai_level='random', p_one_ai_level='random',p_zero_ai_draft_level='random',p_one_ai_draft_level='random',p_zero_bonus_id='',p_one_bonus_id='',prebake_order=[], prebake_starter=-1):
         self.p_zero_name = p_zero_name
         self.p_one_name = p_one_name
         self.p_zero_type = p_zero_type
         self.p_one_type = p_one_type
         self.setup = gameSetup(p_zero_bonus_id,p_one_bonus_id,prebake_order,prebake_starter)
-        self.p_ai = [gameAI(0, p_zero_ai_level), gameAI(1, p_one_ai_level)]
+        self.p_ai = self.p_ai = [gameAI(0, p_zero_ai_level,p_zero_ai_draft_level), gameAI(1, p_one_ai_level,p_one_ai_draft_level)]
 
     def mainLoop(self):
         print("Begin draft phase.")
@@ -165,7 +165,7 @@ class usurperGame:
         return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
 
 
-#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full',
+#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full','random','random',
 #                   'X6',
 #                   'X10',
 #                   ['G4', 'B4', 'R1', 'B5', 'Y2', 'B9', 'G1', 'B6', 'Y8', 'B10', 'B8', 'R3', 'G8', 'Y7', 'G6', 'R9', 'Y3', 'Y1', 'R8', 'G3', 'G10', 'G2', 'B7', 'R5', 'R10', 'Y5', 'R2', 'G5', 'G7', 'R7', 'R11', 'Y11', 'Y9', 'Y10', 'R4', 'B11', 'B1', 'Y4', 'Y6', 'B2', 'R6', 'G9', 'G11', 'B3'],

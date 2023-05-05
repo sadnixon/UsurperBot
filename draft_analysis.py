@@ -223,7 +223,7 @@ for i in range(x):
         
         combo_list = list(combo)
         print('STARTING GAME IN ROUND '+str(i))
-        game = usurperGame("UsurperBot1", "UsurperBot2", 'AI','AI', 'full', 'full', combo_list[0], combo_list[1])
+        game = usurperGame("UsurperBot1", "UsurperBot2", 'AI','AI', 'full','full','random','random', combo_list[0], combo_list[1])
         p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, p_zero_grid, p_one_grid, p_zero_bonus_score, p_one_bonus_score = game.mainLoop()
         print('ENDING GAME IN ROUND '+str(i))
 

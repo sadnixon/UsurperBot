@@ -59,6 +59,11 @@ def renderGame(window,game_width,game_height,setup):
         #p_one_hand_image = card_image_dict[setup.p_one_hand[i].color][int(setup.p_one_hand[i].card_id[1])-1]
         window.blit(setup.card_back, (card_x + card_x*i,0))
 
+    player_bonus_image = setup.card_image_dict[setup.p_zero_bonus[0].card_id[0]][int(setup.p_zero_bonus[0].card_id[1:])-1]
+    window.blit(player_bonus_image,(0,(card_y*3)))
+
+    window.blit(setup.bonus_back,(0,0))
+
     return img_list,rect_list,topleft_list, placement_rect
 
 def renderGame_update(window,game_width,game_height,setup,img_list,rect_list,topleft_list,moving_index):
@@ -94,6 +99,11 @@ def renderGame_update(window,game_width,game_height,setup,img_list,rect_list,top
     for i in range(len(setup.p_one_hand)):
         #p_one_hand_image = card_image_dict[setup.p_one_hand[i].color][int(setup.p_one_hand[i].card_id[1])-1]
         window.blit(setup.card_back, (card_x + card_x*i,0))
+
+    player_bonus_image = setup.card_image_dict[setup.p_zero_bonus[0].card_id[0]][int(setup.p_zero_bonus[0].card_id[1:])-1]
+    window.blit(player_bonus_image,(0,(card_y*3)))
+
+    window.blit(setup.bonus_back,(0,0))
 
     if moving_index != -1:
         moving_card_image = img_list[moving_index]
