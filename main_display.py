@@ -204,7 +204,7 @@ class usurperGame:
 
 start_game = True
 while start_game:
-    game = usurperGame("Spencer", "UsurperBot2", 'Human', 'AI','full','full','overall_pair_averages','overall_pair_averages',prebake_starter = 0)
+    game = usurperGame("Spencer", "Cuck", 'Human', 'AI','full','full','wifes_boyfriend','wifes_boyfriend',prebake_starter = 0)
     restart = game.mainLoop()
     if restart == 'n':
         start_game = False

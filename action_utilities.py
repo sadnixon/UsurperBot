@@ -409,7 +409,7 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
             print_card_list(player_grid[2])
         if human:
             if display:
-                decision = input_waiter_yesno(screen,setup,game_width,game_height,'G3',g3_coords[0],g3_coords[1])
+                decision = input_waiter_yesno(screen,setup,game_width,game_height,'G3',g3_coords[0],g3_coords[1]+1)
             else:
                 decision = ""
                 while decision not in ['y', 'n']:

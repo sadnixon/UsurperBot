@@ -18,7 +18,7 @@ import copy
 import pandas as pd
 
 instant_priority = {'Y5': 0, 'G4': 1, 'R10': 2, 'R9': 3,
-                    'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8,'N0': 9}
+                    'R2': 4, 'R7': 5, 'R4': 6, 'R8': 7, 'Y8': 8, 'N0': 9}
 for color in ['R', 'G', 'Y', 'B']:
     for num in range(1, 12):
         if color+str(num) not in instant_priority:
@@ -30,7 +30,7 @@ N0 = gameCard('dummy', 'N0', 0, '', 0, 0, 0,
 
 
 class gameAI:
-    def __init__(self, player_num, mode, draft_mode, order_cutoff = False):
+    def __init__(self, player_num, mode, draft_mode, order_cutoff=False):
         self.mode = mode
         self.draft_mode = draft_mode
         self.order_cutoff = order_cutoff
@@ -52,11 +52,14 @@ class gameAI:
         self.PR = []
         self.CR_list = []
         self.CR_list_opp = []
-        if draft_mode!='random':
-            self.PR = pd.read_csv('./3_cycle_values/point_references/point_references_avg.csv').set_index('Unnamed: 0')
+        if draft_mode != 'random':
+            self.PR = pd.read_csv(
+                './Hella_Cycles_Values/point_references/point_references_avg.csv').set_index('Unnamed: 0')
             for l in range(10):
-                self.CR_list.append(pd.read_csv('./3_cycle_values/cross_references_averages/cross_references_X'+str(l+1)+'_avg.csv').set_index('Unnamed: 0'))
-                self.CR_list_opp.append(pd.read_csv('./3_cycle_values/cross_references_averages_opp/cross_references_X'+str(l+1)+'_avg_opp.csv').set_index('Unnamed: 0'))
+                self.CR_list.append(pd.read_csv(
+                    './Hella_Cycles_Values/cross_references_averages/cross_references_X'+str(l+1)+'_avg.csv').set_index('Unnamed: 0'))
+                self.CR_list_opp.append(pd.read_csv(
+                    './Hella_Cycles_Values/cross_references_averages_opp/cross_references_X'+str(l+1)+'_avg_opp.csv').set_index('Unnamed: 0'))
 
     def player_see_card(self, card):
         if card.card_id in ['N0', 'A0', 'dA0']:
@@ -214,116 +217,154 @@ class gameAI:
             player_grid = setup.p_one_grid
 
         if self.draft_mode == 'points':
-            # TODO MAKE DRAFT DECISION
             indexes_scores = []
             for i in range(6):
-                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                    card_score = self.PR[player_bonus[0].card_id][setup.draft_options[i].card_id]
-                    indexes_scores.append((i,card_score))
-            indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                    card_score = self.PR[player_bonus[0]
+                                         .card_id][setup.draft_options[i].card_id]
+                    indexes_scores.append((i, card_score))
+            indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'points_reverse':
-            # TODO MAKE DRAFT DECISION
             indexes_scores = []
             for i in range(6):
-                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                    card_score = self.PR[player_bonus[0].card_id][setup.draft_options[i].card_id]
-                    indexes_scores.append((i,card_score))
-            indexes_scores.sort(key=lambda x: x[1],reverse=False)
+                if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                    card_score = self.PR[player_bonus[0]
+                                         .card_id][setup.draft_options[i].card_id]
+                    indexes_scores.append((i, card_score))
+            indexes_scores.sort(key=lambda x: x[1], reverse=False)
             return indexes_scores[0][0]
         elif self.draft_mode == 'single_card_averages':
             indexes_scores = []
             for i in range(6):
-                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                    card_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
-                    indexes_scores.append((i,card_score))
-            indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                    card_score = self.CR_list[int(
+                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                    indexes_scores.append((i, card_score))
+            indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'pair_averages':
             indexes_scores = []
-            if len(player_hand)==0:
+            if len(player_hand) == 0:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                        card_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
-                        indexes_scores.append((i,card_score))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        card_score = self.CR_list[int(
+                            player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             else:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
                         pair_scores = []
                         for card in player_hand:
-                            card_pair_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         pair_scores_avg = np.mean(pair_scores)
-                        indexes_scores.append((i,pair_scores_avg))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'opp_pair_averages':
             indexes_scores = []
-            if len(self.confirmed_opp_cards)==0:
+            if len(self.confirmed_opp_cards) == 0:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                        card_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
-                        indexes_scores.append((i,card_score))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        card_score = self.CR_list[int(
+                            player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             else:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
                         pair_scores = []
                         for card in self.confirmed_opp_cards:
-                            card_pair_score = self.CR_list_opp[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         pair_scores_avg = np.mean(pair_scores)
-                        indexes_scores.append((i,pair_scores_avg))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'overall_pair_averages':
             indexes_scores = []
-            if len(self.confirmed_opp_cards)==0 and len(player_hand)==0:
+            if len(self.confirmed_opp_cards) == 0 and len(player_hand) == 0:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                        card_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
-                        indexes_scores.append((i,card_score))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        card_score = self.CR_list[int(
+                            player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             else:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
                         pair_scores = []
                         for card in player_hand:
-                            card_pair_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         for card in self.confirmed_opp_cards:
-                            card_pair_score = self.CR_list_opp[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         pair_scores_avg = np.mean(pair_scores)
-                        indexes_scores.append((i,pair_scores_avg))
-                indexes_scores.sort(key=lambda x: x[1],reverse=True)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'overall_pair_averages_reverse':
             indexes_scores = []
-            if len(self.confirmed_opp_cards)==0 and len(player_hand)==0:
+            if len(self.confirmed_opp_cards) == 0 and len(player_hand) == 0:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
-                        card_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
-                        indexes_scores.append((i,card_score))
-                indexes_scores.sort(key=lambda x: x[1],reverse=False)
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        card_score = self.CR_list[int(
+                            player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=False)
             else:
                 for i in range(6):
-                    if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
                         pair_scores = []
                         for card in player_hand:
-                            card_pair_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         for card in self.confirmed_opp_cards:
-                            card_pair_score = self.CR_list_opp[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
                             pair_scores.append(card_pair_score)
                         pair_scores_avg = np.mean(pair_scores)
-                        indexes_scores.append((i,pair_scores_avg))
-                indexes_scores.sort(key=lambda x: x[1],reverse=False)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=False)
+            return indexes_scores[0][0]
+        elif self.draft_mode == 'wifes_boyfriend':
+            indexes_scores = []
+            possible_opp_bonus_ints = [
+                int(x.card_id[1:])-1 for x in self.possible_opp_bonus_cards]
+            if len(self.confirmed_opp_cards) == 0 and len(player_hand) == 0:
+                for i in range(6):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        card_score = np.mean([self.CR_list[x][setup.draft_options[i].card_id]
+                                             [setup.draft_options[i].card_id] for x in possible_opp_bonus_ints])
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+            else:
+                for i in range(6):
+                    if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                        pair_scores = []
+                        for card in self.confirmed_opp_cards:
+                            card_pair_score = np.mean(
+                                [self.CR_list[x][setup.draft_options[i].card_id][card.card_id] for x in possible_opp_bonus_ints])
+                            pair_scores.append(card_pair_score)
+                        for card in player_hand:
+                            card_pair_score = np.mean(
+                                [self.CR_list_opp[x][setup.draft_options[i].card_id][card.card_id] for x in possible_opp_bonus_ints])
+                            pair_scores.append(card_pair_score)
+                        pair_scores_avg = np.mean(pair_scores)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
             return indexes_scores[0][0]
         elif self.draft_mode == 'random':
             for i in range(6):
-                if check_if_legal(player_grid,player_hand+[setup.draft_options[i]]):
+                if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
                     return i
             return random.choice(range(6))
 
@@ -373,7 +414,7 @@ class gameAI:
                         found_possible_combo = True
                     else:
                         continue
-                    
+
                     combo = list(combo_base)
                     for i in range(open_spot_count-combo_length):
                         combo.append(N0.__copy__())
@@ -383,17 +424,18 @@ class gameAI:
                         grid_sum += sum(
                             [item != 0 for sublist in combo[i].placement_grid for item in sublist])
 
-                    if sum([card.activation for card in combo]) > 0 and grid_sum > 54 and check_if_legal(player_grid,combo,True):
+                    if sum([card.activation for card in combo]) > 0 and grid_sum > 54 and check_if_legal(player_grid, combo, True):
                         pluses_floor = 1
                     else:
                         pluses_floor = 0
 
-                    dist_dict, dist_keys = combo_narrower(player_grid,combo)
+                    dist_dict, dist_keys = combo_narrower(player_grid, combo)
                     if dist_dict:
-                        all_orders = list(set(itertools.permutations(dist_keys)))
+                        all_orders = list(
+                            set(itertools.permutations(dist_keys)))
                     else:
                         all_orders = list(itertools.permutations(combo))
-                    
+
                     random.Random(4).shuffle(all_orders)
                     all_scores = []
                     num_orders = len(all_orders)
@@ -409,16 +451,16 @@ class gameAI:
                                 order_list.append(dist_dict_copy[d_key].pop(0))
                         else:
                             order_list = list(order)
-                        
+
                         out_of_place = 0
-                        if 'G7' in [card.card_id for card in order_list] and open_spot_count>2 and (master_test_grid[1][2] == 0 or master_test_grid[2][0] == 0):
+                        if 'G7' in [card.card_id for card in order_list] and open_spot_count > 2 and (master_test_grid[1][2] == 0 or master_test_grid[2][0] == 0):
                             out_of_place_limit = 2
                         else:
                             out_of_place_limit = 1
                         order_list = [card.__copy__() for card in order_list]
                         order_distributor = order_list.copy()
                         test_grid, _ = grid_deep_copy(player_grid)
-                        
+
                         pluses = 0
                         g7_target_x = -1
                         g7_target_y = -1
@@ -436,9 +478,10 @@ class gameAI:
                                             break
                                         possible = False
                                         for k in range(9):
-                                            if order_distributor[0].placement_grid[k//3][k%3] != 0 and master_test_grid[k//3][k%3] == 0 and set([(k//3 , k%3), (i, j)]) != set([(2,0),(1,2)]):
+                                            if order_distributor[0].placement_grid[k//3][k % 3] != 0 and master_test_grid[k//3][k % 3] == 0 and set([(k//3, k % 3), (i, j)]) != set([(2, 0), (1, 2)]):
                                                 possible = True
-                                                g7_move_options.append((k//3,k%3))
+                                                g7_move_options.append(
+                                                    (k//3, k % 3))
                                         if possible:
                                             g7_card_id = order_distributor[0].card_id
                                             g7_target_x = i
@@ -454,7 +497,7 @@ class gameAI:
                                     test_grid[i][j] = order_distributor.pop(0)
                         if out_of_place == out_of_place_limit or pluses < pluses_floor:
                             continue
-                        if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y) or (len(g7_move_options)==1 and g7_move_options[0] == (g7_placement_x,g7_placement_y))):
+                        if out_of_place == 1 and out_of_place_limit == 2 and (('G7' not in [test_grid[1][2].card_id, test_grid[2][0].card_id]) or (g7_placement_x, g7_placement_y) == (g7_target_x, g7_target_y) or (len(g7_move_options) == 1 and g7_move_options[0] == (g7_placement_x, g7_placement_y))):
                             continue
 
                         valid_orders += 1
@@ -483,10 +526,11 @@ class gameAI:
                         else:
                             cutoff = 4
                         less_than_cut = list(filter(
-                            lambda x: x.base_points < cutoff and x.card_id not in ['B7','N0'], sorted_order))
+                            lambda x: x.base_points < cutoff and x.card_id not in ['B7', 'N0'], sorted_order))
                         cut_or_more = list(filter(
                             lambda x: x.base_points > cutoff - 1 or x.card_id == 'B7', sorted_order))
-                        filler_cards = list(filter(lambda x: x.card_id == 'N0', sorted_order))
+                        filler_cards = list(
+                            filter(lambda x: x.card_id == 'N0', sorted_order))
                         if 'Y1' in order_ids:
                             sorted_order = less_than_cut + y1_bloc + cut_or_more + filler_cards
                         else:
@@ -496,20 +540,23 @@ class gameAI:
                         if g7_bloc != [0, 0]:
                             g7_test_sorted_order = sorted_order.copy()
                             g7_test_grid = master_test_grid.copy()
-                            flat_grid_ids = [item.card_id for sublist in test_grid for item in sublist]
+                            flat_grid_ids = [
+                                item.card_id for sublist in test_grid for item in sublist]
                             g7_test_grid[g7_placement_x][g7_placement_y] = g7_bloc[1]
                             insert_idx = 0
                             Y1_or_N0_found = False
                             g7_move_x = -1
                             g7_move_y = -1
                             for x in range(len(g7_test_sorted_order)):
-                                grid_index = flat_grid_ids.index(g7_test_sorted_order[0].card_id)
+                                grid_index = flat_grid_ids.index(
+                                    g7_test_sorted_order[0].card_id)
                                 i = grid_index//3
-                                j = grid_index%3
-                                if g7_test_sorted_order[0].card_id in ['Y1','N0']:
+                                j = grid_index % 3
+                                if g7_test_sorted_order[0].card_id in ['Y1', 'N0']:
                                     Y1_or_N0_found = True
                                 else:
-                                    g7_test_grid[i][j] = g7_test_sorted_order.pop(0)
+                                    g7_test_grid[i][j] = g7_test_sorted_order.pop(
+                                        0)
                                 if g7_bloc[0].placement_grid[i][j] != 0:
                                     g7_move_x = i
                                     g7_move_y = j
@@ -517,7 +564,7 @@ class gameAI:
                                     sorted_order = sorted_order[:insert_idx] + \
                                         g7_bloc + \
                                         sorted_order[insert_idx:]
-                                    if (g7_move_x, g7_move_y) == (-1,-1):
+                                    if (g7_move_x, g7_move_y) == (-1, -1):
                                         for k in range(3):
                                             for l in range(3):
                                                 if g7_test_grid[k][l] == 0 and g7_bloc[0].placement_grid[k][l] != 0:
@@ -542,7 +589,8 @@ class gameAI:
                         self.last_plan, _ = grid_deep_copy(test_grid)
 
                         if self.player_num == 0:
-                            test_setup.p_zero_grid, _ = grid_deep_copy(player_grid)
+                            test_setup.p_zero_grid, _ = grid_deep_copy(
+                                player_grid)
                             test_setup.p_one_grid, fill_card_count = grid_deep_copy(
                                 opponent_grid)
                             test_setup.p_zero_bonus = player_bonus
@@ -553,7 +601,8 @@ class gameAI:
                                     opponent_fill_card.__copy__())
                             test_setup.turn = 0
                         else:
-                            test_setup.p_one_grid, _ = grid_deep_copy(player_grid)
+                            test_setup.p_one_grid, _ = grid_deep_copy(
+                                player_grid)
                             test_setup.p_zero_grid, fill_card_count = grid_deep_copy(
                                 opponent_grid)
                             test_setup.p_one_bonus = player_bonus
@@ -633,7 +682,7 @@ class gameAI:
                             else:
                                 best_g7_plan = {
                                     'decision': 'n', 'move_x': -1, 'move_y': -1, 'target_x': -1, 'target_y': -1}
-                                
+
                         if self.order_cutoff and num_orders > 2000 and tested_orders > num_orders/2 and valid_orders % 5 == 0:
                             curr_mean = np.mean(all_scores)
                             curr_std = np.std(all_scores)
@@ -651,7 +700,8 @@ class gameAI:
                     combo_length -= 1
 
             self.last_plan = best_plan
-            self.last_order = list(filter(lambda x: x.card_id != 'N0', best_order[1:]))
+            self.last_order = list(
+                filter(lambda x: x.card_id != 'N0', best_order[1:]))
             self.g7_plan = best_g7_plan
             self.last_cpx_order = best_cpx_order
             self.last_cpy_order = best_cpy_order
@@ -659,7 +709,7 @@ class gameAI:
 
             card_selection_index = [
                 card.name for card in player_hand].index(best_next_card_name)
-            
+
             print([card.card_id for card in self.last_order])
             print(self.g7_plan)
 
@@ -838,10 +888,106 @@ class gameAI:
                 return flip_x, flip_y
         elif instant_id == 'R10':
             self.new_plan = True
-            if self.mode == 'full':
-                # TODO UPDATE WITH DRAFTING WEIGHTS
-                return 0
-            elif self.mode == 'random':
+            if self.draft_mode == 'points':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        card_score = self.PR[player_bonus[0]
+                                             .card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'points_reverse':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        card_score = self.PR[player_bonus[0]
+                                             .card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=False)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'single_card_averages':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        card_score = self.CR_list[int(
+                            player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                        indexes_scores.append((i, card_score))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'pair_averages':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        pair_scores = []
+                        for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        pair_scores_avg = np.mean(pair_scores)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'opp_pair_averages':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        pair_scores = []
+                        for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        pair_scores_avg = np.mean(pair_scores)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                return indexes_scores[0][0]
+            elif self.draft_mode in ['overall_pair_averages', 'wifes_boyfriend']:
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        pair_scores = []
+                        for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        pair_scores_avg = np.mean(pair_scores)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'overall_pair_averages_reverse':
+                indexes_scores = []
+                for i in range(4):
+                    if check_if_legal(player_grid, [setup.draft_options[i]]):
+                        pair_scores = []
+                        for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                            if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                continue
+                            card_pair_score = self.CR_list_opp[int(
+                                player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                            pair_scores.append(card_pair_score)
+                        pair_scores_avg = np.mean(pair_scores)
+                        indexes_scores.append((i, pair_scores_avg))
+                indexes_scores.sort(key=lambda x: x[1], reverse=False)
+                return indexes_scores[0][0]
+            elif self.draft_mode == 'random':
                 return 0
         elif instant_id == 'Y8':
             if self.mode == 'full':
@@ -866,7 +1012,7 @@ class gameAI:
                 return random.choice(['y', 'n'])
         elif instant_id == 'G4':
             self.new_plan = True
-            if self.mode == 'full':
+            if self.draft_mode != 'random':
                 if len(setup.draft_options) == 0:
                     replacement_dict, replacement_card = self.average_card(
                         True)
@@ -890,18 +1036,112 @@ class gameAI:
                             card_placement_x = x
                     return card_selection_x
                 else:
-                    # TODO UPDATE WITH DRAFTING WEIGHTS
-                    for card_selection_x in range(3):
-                        if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
-                            return card_selection_x
+                    if self.draft_mode == 'points':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                card_score = self.PR[player_bonus[0]
+                                                     .card_id][setup.draft_options[i].card_id]
+                                indexes_scores.append((i, card_score))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode == 'points_reverse':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                card_score = self.PR[player_bonus[0]
+                                                     .card_id][setup.draft_options[i].card_id]
+                                indexes_scores.append((i, card_score))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=False)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode == 'single_card_averages':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                card_score = self.CR_list[int(
+                                    player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+                                indexes_scores.append((i, card_score))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode == 'pair_averages':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                pair_scores = []
+                                for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                pair_scores_avg = np.mean(pair_scores)
+                                indexes_scores.append((i, pair_scores_avg))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode == 'opp_pair_averages':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                pair_scores = []
+                                for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list_opp[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                pair_scores_avg = np.mean(pair_scores)
+                                indexes_scores.append((i, pair_scores_avg))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode in ['overall_pair_averages', 'wifes_boyfriend']:
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                pair_scores = []
+                                for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list_opp[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                pair_scores_avg = np.mean(pair_scores)
+                                indexes_scores.append((i, pair_scores_avg))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=True)
+                        return indexes_scores[0][0]
+                    elif self.draft_mode == 'overall_pair_averages_reverse':
+                        indexes_scores = []
+                        for i in range(3):
+                            if check_if_legal(player_grid, player_hand+[setup.draft_options[i]]):
+                                pair_scores = []
+                                for card in player_hand + [item for sublist in player_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                for card in self.confirmed_opp_cards + [item for sublist in opponent_grid for item in sublist]:
+                                    if card == 0 or card.card_id in ['N0', 'A0', 'dA0']:
+                                        continue
+                                    card_pair_score = self.CR_list_opp[int(
+                                        player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                                    pair_scores.append(card_pair_score)
+                                pair_scores_avg = np.mean(pair_scores)
+                                indexes_scores.append((i, pair_scores_avg))
+                        indexes_scores.sort(key=lambda x: x[1], reverse=False)
+                        return indexes_scores[0][0]
                     return 0
-                        
-            elif self.mode == 'random':
+            elif self.draft_mode == 'random':
                 if len(setup.draft_options) == 0:
                     return random.choice(range(len(player_hand)))
                 else:
                     for card_selection_x in range(3):
-                        if check_if_legal(player_grid,player_hand+[setup.draft_options[card_selection_x]]):
+                        if check_if_legal(player_grid, player_hand+[setup.draft_options[card_selection_x]]):
                             return card_selection_x
                     return 0
         elif instant_id == 'G7':
@@ -924,7 +1164,7 @@ class gameAI:
                 return decision, move_x, move_y, target_x, target_y
 
     def pre_score_decision(self, setup, pre_score_id, i, j, test=False):
-        if setup.turn==0:
+        if setup.turn == 0:
             player_bonus = setup.p_zero_bonus
             player_grid = setup.p_zero_grid
             opponent_grid = setup.p_one_grid
