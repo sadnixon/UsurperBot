@@ -79,7 +79,7 @@ for comp_combo in itertools.combinations(list(competitors.keys()), 2):
                 competitor_data[winning_bonus][winner] += 1
                 competitor_data[loser][winner] += 1
 
-                if comp_combo_list[s_index] == winner:
+                if comp_combo_list[starters[s_index]] == winner:
                     competitor_data['first'][winner] += 1
                 else:
                     competitor_data['second'][winner] += 1
