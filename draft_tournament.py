@@ -62,8 +62,8 @@ for comp_combo in itertools.combinations(list(competitors.keys()), 2):
                 loser = comp_combo_list[0]
             else:
                 winner = "tie"
-            game_data.loc[len(game_data)] = [comp_combo_list[0], comp_combo_list[1], winner, loser, comp_combo_list[s_index],
-                                             comp_combo_list[abs(s_index-1)], p_zero_score, p_one_score]+bonuses+p_zero_draft+p_one_draft
+            game_data.loc[len(game_data)] = [comp_combo_list[0], comp_combo_list[1], winner, loser, comp_combo_list[starters[s_index]],
+                                             comp_combo_list[abs(starters[s_index]-1)], p_zero_score, p_one_score]+bonuses+p_zero_draft+p_one_draft
 
             for card in p_zero_draft:
                 competitor_data[card][comp_combo_list[0]] += 1
