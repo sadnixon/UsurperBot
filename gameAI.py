@@ -896,7 +896,10 @@ class gameAI:
                                              .card_id][setup.draft_options[i].card_id]
                         indexes_scores.append((i, card_score))
                 indexes_scores.sort(key=lambda x: x[1], reverse=True)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'points_reverse':
                 indexes_scores = []
                 for i in range(4):
@@ -905,7 +908,10 @@ class gameAI:
                                              .card_id][setup.draft_options[i].card_id]
                         indexes_scores.append((i, card_score))
                 indexes_scores.sort(key=lambda x: x[1], reverse=False)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'single_card_averages':
                 indexes_scores = []
                 for i in range(4):
@@ -914,7 +920,10 @@ class gameAI:
                             player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
                         indexes_scores.append((i, card_score))
                 indexes_scores.sort(key=lambda x: x[1], reverse=True)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'pair_averages':
                 indexes_scores = []
                 for i in range(4):
@@ -929,7 +938,10 @@ class gameAI:
                         pair_scores_avg = np.mean(pair_scores)
                         indexes_scores.append((i, pair_scores_avg))
                 indexes_scores.sort(key=lambda x: x[1], reverse=True)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'opp_pair_averages':
                 indexes_scores = []
                 for i in range(4):
@@ -944,7 +956,10 @@ class gameAI:
                         pair_scores_avg = np.mean(pair_scores)
                         indexes_scores.append((i, pair_scores_avg))
                 indexes_scores.sort(key=lambda x: x[1], reverse=True)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode in ['overall_pair_averages', 'wifes_boyfriend']:
                 indexes_scores = []
                 for i in range(4):
@@ -965,7 +980,10 @@ class gameAI:
                         pair_scores_avg = np.mean(pair_scores)
                         indexes_scores.append((i, pair_scores_avg))
                 indexes_scores.sort(key=lambda x: x[1], reverse=True)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'overall_pair_averages_reverse':
                 indexes_scores = []
                 for i in range(4):
@@ -986,7 +1004,10 @@ class gameAI:
                         pair_scores_avg = np.mean(pair_scores)
                         indexes_scores.append((i, pair_scores_avg))
                 indexes_scores.sort(key=lambda x: x[1], reverse=False)
-                return indexes_scores[0][0]
+                if len(indexes_scores)>0:
+                    return indexes_scores[0][0]
+                else:
+                    return 0
             elif self.draft_mode == 'random':
                 return 0
         elif instant_id == 'Y8':
