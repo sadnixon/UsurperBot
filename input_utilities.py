@@ -479,8 +479,7 @@ def input_waiter_results(screen, setup, game_width, game_height, p_zero_name, p_
                 print('resized')
                 setup.set_card_sizes(
                     event.size[0], event.size[1], game_width, game_height, results=True)
-                yes_rect, no_rect = renderGameResults(screen, game_width, game_height, setup, p_zero_name,
-                                                      p_one_name, p_zero_score, p_one_score, p_zero_bonus_score, p_one_bonus_score, mouse_over)
+                yes_rect, no_rect = renderGameResults_update(screen, game_width, game_height, mouse_over)
             elif event.type == MOUSEBUTTONUP:
                 if yes_rect.collidepoint(event.pos):
                     decision = 'y'
@@ -498,8 +497,7 @@ def input_waiter_results(screen, setup, game_width, game_height, p_zero_name, p_
         else:
             mouse_over = 'n/a'
 
-        renderGameResults(screen, game_width, game_height, setup, p_zero_name, p_one_name,
-                          p_zero_score, p_one_score, p_zero_bonus_score, p_one_bonus_score, mouse_over)
+        renderGameResults_update(screen, game_width, game_height, mouse_over)
 
         pygame.display.update()
 

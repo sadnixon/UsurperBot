@@ -729,7 +729,7 @@ def renderGameFlip(window,game_width,game_height,setup,instant_id,highlight=-1):
 
     return rect_list
 
-def renderGameResults(window,game_width,game_height,setup,p_zero_name,p_one_name,p_zero_score,p_one_score,p_zero_bonus_score,p_one_bonus_score,mouse_over='n/a'):
+def renderGameResults(window,game_width,game_height,setup,p_zero_name,p_one_name,p_zero_score,p_one_score,p_zero_bonus_score,p_one_bonus_score):
     window.fill((25, 25, 25))
 
     window_height = window.get_height()
@@ -776,17 +776,11 @@ def renderGameResults(window,game_width,game_height,setup,p_zero_name,p_one_name
     yes_rect = pygame.Rect(card_x*4,0,card_x,round(card_y*0.5))
     no_rect = pygame.Rect(card_x*4,round(card_y*0.5),card_x,round(card_y*0.5))
 
-    if mouse_over == 'y':
-        pygame.draw.rect(window,(150,150,150),yes_rect,0)
-    else:
-        pygame.draw.rect(window,(50,50,50),yes_rect,0)
+    pygame.draw.rect(window,(50,50,50),yes_rect,0)
     pygame.draw.rect(window,(89,141,81),yes_rect,10)
     window.blit(yes_text,yes_text_rect)
 
-    if mouse_over == 'n':
-        pygame.draw.rect(window,(150,150,150),no_rect,0)
-    else:
-        pygame.draw.rect(window,(50,50,50),no_rect,0)
+    pygame.draw.rect(window,(50,50,50),no_rect,0)
     pygame.draw.rect(window,(198,56,72),no_rect,10)
     window.blit(no_text,no_text_rect)
 
@@ -817,5 +811,46 @@ def renderGameResults(window,game_width,game_height,setup,p_zero_name,p_one_name
     p_one_surface.fill((25, 25, 25))
     blit_text(p_one_surface,p_one_score_text,(20,0),font_small,(255,255,255))
     window.blit(p_one_surface,(card_x*3,card_y*2))
+
+    return yes_rect,no_rect
+
+def renderGameResults_update(window,game_width,game_height,mouse_over='n/a'):
+
+    window_height = window.get_height()
+    window_width = window.get_width()
+
+    if  game_width/game_height < window_width/window_height:
+        max_surface_x = round(window_height*(game_width/game_height))
+        max_surface_y = window_height
+    else:
+        max_surface_x = window_width
+        max_surface_y = round(window_width*(game_height/game_width))
+
+    card_x = round(max_surface_x * 1/9)
+    card_y = round(max_surface_y * 1/4)
+
+    font = pygame.font.Font(None,50)
+
+    yes_text = font.render("RESTART",True,(89,141,81))
+    no_text = font.render("QUIT",True,(198,56,72))
+    yes_text_rect = yes_text.get_rect(center = (round(card_x*4.5),round(card_y*0.25)) )
+    no_text_rect = no_text.get_rect(center = (round(card_x*4.5),round(card_y*0.75)) )
+
+    yes_rect = pygame.Rect(card_x*4,0,card_x,round(card_y*0.5))
+    no_rect = pygame.Rect(card_x*4,round(card_y*0.5),card_x,round(card_y*0.5))
+
+    if mouse_over == 'y':
+        pygame.draw.rect(window,(150,150,150),yes_rect,0)
+    else:
+        pygame.draw.rect(window,(50,50,50),yes_rect,0)
+    pygame.draw.rect(window,(89,141,81),yes_rect,10)
+    window.blit(yes_text,yes_text_rect)
+
+    if mouse_over == 'n':
+        pygame.draw.rect(window,(150,150,150),no_rect,0)
+    else:
+        pygame.draw.rect(window,(50,50,50),no_rect,0)
+    pygame.draw.rect(window,(198,56,72),no_rect,10)
+    window.blit(no_text,no_text_rect)
 
     return yes_rect,no_rect
