@@ -75,7 +75,7 @@ class usurperGame:
             print("Draft options:")
             print_card_list(self.setup.draft_options)
             if (self.setup.turn == 0 and self.p_zero_type == 'Human') or (self.setup.turn == 1 and self.p_one_type == 'Human'):
-                draft_selection_index = input_waiter_draft(screen,self.setup,game_width,game_height)
+                draft_selection_index = input_waiter_draft(screen,self.setup,game_width,game_height,self.p_ai[self.setup.turn])
             else:
                 draft_selection_index = self.p_ai[self.setup.turn].draft_decision(
                     self.setup)
@@ -204,7 +204,7 @@ class usurperGame:
 
 start_game = True
 while start_game:
-    game = usurperGame("Spencer", "Cuck", 'Human', 'AI','full','full','wifes_boyfriend','wifes_boyfriend',prebake_starter = 0)
+    game = usurperGame("Spencer", "Cuck", 'Human', 'AI','full','full','wifes_boyfriend','wifes_boyfriend',prebake_order = ['R3', 'G10', 'R2', 'B3', 'R1', 'R4', 'B9', 'G6', 'G3', 'R10', 'Y9', 'B7', 'R6', 'G7', 'Y10', 'B6', 'B11', 'R11', 'B10', 'B5', 'G9', 'B1', 'Y11', 'R5', 'B4', 'R7', 'Y6', 'Y7', 'G5', 'Y3', 'Y1', 'G1', 'G11', 'Y8', 'Y5', 'G4', 'B2', 'B8', 'Y4', 'G8', 'Y2', 'R8', 'G2', 'R9'], prebake_starter = 0)
     restart = game.mainLoop()
     if restart == 'n':
         start_game = False

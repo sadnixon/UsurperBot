@@ -142,11 +142,13 @@ def input_waiter_play(screen, setup, game_width, game_height, player=True):
     return card_selection_index, card_placement_x, card_placement_y
 
 
-def input_waiter_draft(screen, setup, game_width, game_height, player=True):
+def input_waiter_draft(screen, setup, game_width, game_height, player_ai):
     draft_selection_index = -1
 
+    score_dict = player_ai.draft_scores(setup)
+
     img_list, rect_list, topleft_list, placement_rect = renderGame(
-        screen, game_width, game_height, setup)
+        screen, game_width, game_height, setup, score_dict)
 
     moving = False
     moving_index = -1
@@ -164,7 +166,7 @@ def input_waiter_draft(screen, setup, game_width, game_height, player=True):
                 setup.set_card_sizes(
                     event.size[0], event.size[1], game_width, game_height, True)
                 img_list, rect_list, topleft_list, placement_rect = renderGame(
-                    screen, game_width, game_height, setup)
+                    screen, game_width, game_height, setup, score_dict)
             elif event.type == MOUSEBUTTONDOWN:
                 print(event.pos)
                 for rect in rect_list:
@@ -185,7 +187,7 @@ def input_waiter_draft(screen, setup, game_width, game_height, player=True):
                 draft_selection_index = int(event.key)-49
 
         renderGame_update(screen, game_width, game_height, setup,
-                          img_list, rect_list, topleft_list, moving_index)
+                          img_list, rect_list, topleft_list, moving_index, score_dict)
 
         pygame.display.update()
 

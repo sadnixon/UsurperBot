@@ -272,6 +272,12 @@ def evaluation(player_grid_original, opponent_grid_original, player_bonus, exp_d
                     else:
                         current_card.base_points = 8
                         current_card.changepoints(8-current_card.points)
+                    if i < 2 and player_grid[i+1][j].card_id == 'G6':
+                        current_card.changepoints(current_card.base_points)
+                        current_card.base_points = current_card.base_points * 2
+                    if j < 2 and player_grid[i][j+1].card_id == 'R3':
+                        current_card.changepoints(current_card.base_points)
+                        current_card.base_points = current_card.base_points * 2
                 elif current_id == 'B8':
                     if current_card.placement_grid[i][j] == 2:
                         flat_grid = [(item.base_points == 1 and not item.flipped)

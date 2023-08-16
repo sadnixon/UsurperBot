@@ -371,28 +371,29 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
                     decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j,test=test)
                 if decision == 'y':
                     setup.flip_card(setup.turn, i, j)
-            elif player_grid[i][j].card_id == 'G6' and i < 2 and player_grid[i+1][j].card_id != 'N0':
-                if i > 0:
+            elif player_grid[i][j].card_id == 'G6':
+                if i > 0 and player_grid[i-1][j].card_id != 'N0':
                     upper_points = player_grid[i-1][j].base_points
                     player_grid[i-1][j].changepoints(upper_points)
                     player_grid[1-1][j].base_points = player_grid[1][j-1].base_points*2
-                if not test:
-                    print_card_list(player_grid[0])
-                    print_card_list(player_grid[1])
-                    print_card_list(player_grid[2])
-                if human:
-                    if display:
-                        decision = input_waiter_yesno(screen,setup,game_width,game_height,'G6',i+1,j)
+                if i < 2 and player_grid[i+1][j].card_id != 'N0':
+                    if not test:
+                        print_card_list(player_grid[0])
+                        print_card_list(player_grid[1])
+                        print_card_list(player_grid[2])
+                    if human:
+                        if display:
+                            decision = input_waiter_yesno(screen,setup,game_width,game_height,'G6',i+1,j)
+                        else:
+                            decision = ""
+                            while decision not in ['y', 'n']:
+                                print(
+                                    f"{name}, do you want to flip {player_grid[i+1][j].name} y/n")
+                                decision = input()
                     else:
-                        decision = ""
-                        while decision not in ['y', 'n']:
-                            print(
-                                f"{name}, do you want to flip {player_grid[i+1][j].name} y/n")
-                            decision = input()
-                else:
-                    decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j,test=test)
-                if decision == 'y':
-                    setup.flip_card(setup.turn, i+1, j)
+                        decision = player_ai.pre_score_decision(setup,player_grid[i][j].card_id,i,j,test=test)
+                    if decision == 'y':
+                        setup.flip_card(setup.turn, i+1, j)
             elif player_grid[i][j].card_id == 'G11':
                 for adj in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]:
                     if adj[0] >= 0 and adj[0] <= 2 and adj[1] >= 0 and adj[1] <= 2:
@@ -401,7 +402,7 @@ def execute_pre_scoring(setup, player_ai, name, type, coords = [-1,-1], test = F
             elif player_grid[i][j].card_id == 'R3' and j>0 and player_grid[i][j-1].card_id != 'N0':
                 left_points = player_grid[i][j-1].base_points
                 player_grid[i][j-1].changepoints(left_points)
-                player_grid[1][j -1].base_points = player_grid[1][j-1].base_points*2
+                player_grid[i][j -1].base_points = player_grid[i][j-1].base_points*2
     if g3_coords != [-1,-1]:
         if not test:
             print_card_list(player_grid[0])

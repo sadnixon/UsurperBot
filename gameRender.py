@@ -19,7 +19,7 @@ def blit_text(surface, text, pos, font, color=pygame.Color('black')):
         x = pos[0]  # Reset the x.
         y += word_height  # Start on new row.
 
-def renderGame(window,game_width,game_height,setup):
+def renderGame(window,game_width,game_height,setup,score_dict=False):
     window.fill((25, 25, 25))
 
     window_height = window.get_height()
@@ -38,6 +38,8 @@ def renderGame(window,game_width,game_height,setup):
     pygame.draw.rect(window,(255,255,255),pygame.Rect(card_x,card_y*3,card_x*9,card_y),10)
     placement_rect = pygame.Rect(card_x,card_y*3,card_x*9,card_y)
 
+    font_small = pygame.font.Font(None,30)
+
     img_list = []
     rect_list = []
     topleft_list = []
@@ -50,6 +52,12 @@ def renderGame(window,game_width,game_height,setup):
         img_list.append(draft_options_image)
         rect_list.append(rect)
         topleft_list.append(((card_x*2) + card_x*i, (round(card_y*1.5))))
+
+        blit_text(window,str(round(score_dict['points'][i],2)),((card_x*2) + card_x*i,(round(card_y*1))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['single_card_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.1))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.2))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['opp_pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.3))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['overall_pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.4))),font_small,(255,255,255))
     
     for i in range(len(setup.p_zero_hand)):
         p_zero_hand_image = setup.card_image_dict[setup.p_zero_hand[i].color][int(setup.p_zero_hand[i].card_id[1:])-1]
@@ -70,7 +78,7 @@ def renderGame(window,game_width,game_height,setup):
 
     return img_list,rect_list,topleft_list, placement_rect
 
-def renderGame_update(window,game_width,game_height,setup,img_list,rect_list,topleft_list,moving_index):
+def renderGame_update(window,game_width,game_height,setup,img_list,rect_list,topleft_list,moving_index,score_dict=False):
     window.fill((25, 25, 25))
 
     window_height = window.get_height()
@@ -89,12 +97,20 @@ def renderGame_update(window,game_width,game_height,setup,img_list,rect_list,top
     pygame.draw.rect(window,(255,255,255),pygame.Rect(card_x,card_y*3,card_x*9,card_y),10)
     placement_rect = pygame.Rect(card_x,card_y*3,card_x*9,card_y)
 
+    font_small = pygame.font.Font(None,30)
+
     for i in range(len(img_list)):
         if i!=moving_index:
             draft_options_image = img_list[i]
             #window.blit(p_zero_hand_image, (1135 + card_x*(i%2), 0 + card_y*(i//2)))
             rect = rect_list[i]
             window.blit(draft_options_image,rect)
+        
+        blit_text(window,str(round(score_dict['points'][i],2)),((card_x*2) + card_x*i,(round(card_y*1))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['single_card_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.1))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.2))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['opp_pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.3))),font_small,(255,255,255))
+        blit_text(window,str(round(score_dict['overall_pair_averages'][i],2)),((card_x*2) + card_x*i,(round(card_y*1.4))),font_small,(255,255,255))
     
     for i in range(len(setup.p_zero_hand)):
         p_zero_hand_image = setup.card_image_dict[setup.p_zero_hand[i].color][int(setup.p_zero_hand[i].card_id[1:])-1]
@@ -854,3 +870,7 @@ def renderGameResults_update(window,game_width,game_height,mouse_over='n/a'):
     window.blit(no_text,no_text_rect)
 
     return yes_rect,no_rect
+
+
+
+

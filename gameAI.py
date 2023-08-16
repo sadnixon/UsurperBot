@@ -368,6 +368,54 @@ class gameAI:
                     return i
             return random.choice(range(6))
 
+    def draft_scores(self,setup):
+        if self.player_num == 0:
+            player_hand = setup.p_zero_hand
+            player_bonus = setup.p_zero_bonus
+            player_grid = setup.p_zero_grid
+        else:
+            player_hand = setup.p_one_hand
+            player_bonus = setup.p_one_bonus
+            player_grid = setup.p_one_grid
+
+        point_scores = []
+        indiv_scores = []
+        pair_scores = []
+        opp_pair_scores = []
+        for i in range(6):
+            pair_scores_single = []
+            opp_pair_scores_single = []
+            point_score = self.PR[player_bonus[0].card_id][setup.draft_options[i].card_id]
+            card_score_indiv = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][setup.draft_options[i].card_id]
+            for card in player_hand:
+                card_pair_score = self.CR_list[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                pair_scores_single.append(card_pair_score)
+            for card in self.confirmed_opp_cards:
+                card_opp_pair_score = self.CR_list_opp[int(player_bonus[0].card_id[1:])-1][setup.draft_options[i].card_id][card.card_id]
+                opp_pair_scores_single.append(card_opp_pair_score)
+            point_scores.append(point_score)
+            indiv_scores.append(card_score_indiv)
+            pair_scores.append(pair_scores_single)
+            opp_pair_scores.append(opp_pair_scores_single)
+        
+        draft_scores_dict = {}
+        draft_scores_dict['points'] = point_scores
+        draft_scores_dict['single_card_averages'] = indiv_scores
+        if len(player_hand)>0:
+            draft_scores_dict['pair_averages'] = [np.mean(item) for item in pair_scores]
+        else:
+            draft_scores_dict['pair_averages'] = indiv_scores
+        if len(self.confirmed_opp_cards)>0:
+            draft_scores_dict['opp_pair_averages'] = [np.mean(item) for item in opp_pair_scores]
+        else:
+            draft_scores_dict['opp_pair_averages'] = indiv_scores
+        if len(player_hand)>0 or len(self.confirmed_opp_cards)>0:
+            draft_scores_dict['overall_pair_averages'] = [np.mean(opp_pair_scores[x]+pair_scores[x]) for x in range(6)]
+        else:
+            draft_scores_dict['overall_pair_averages'] = indiv_scores
+        
+        return draft_scores_dict
+
     def play_decision(self, setup):
         if self.player_num == 0:
             player_hand = setup.p_zero_hand
