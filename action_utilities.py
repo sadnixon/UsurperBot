@@ -291,7 +291,8 @@ def execute_instant(setup, player, ai, p_zero_name, p_one_name, p_zero_type, p_o
             setup.discard(player, 'draft', 0, 0)
             opp_ai.opp_discard(setup.discard_pile[-1])
     elif instant_id == 'G7':
-        if (pos_x, pos_y) not in [(1,2),(2,0)]:
+        flat_player_grid = [item for sublist in player_grid for item in sublist]
+        if (pos_x, pos_y) not in [(1,2),(2,0)] or 0 not in flat_player_grid:
             return
         if not test:
             print_card_list(player_grid[0])
