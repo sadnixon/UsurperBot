@@ -165,9 +165,9 @@ class usurperGame:
         return p_zero_score, p_one_score, p_zero_draft, p_one_draft, p_zero_indivs, p_one_indivs, self.setup.p_zero_grid, self.setup.p_one_grid, p_zero_bonus_score, p_one_bonus_score
 
 
-#game = usurperGame("UsurperBot1", "UsurperBot2", 'AI', 'AI','full','full','random','random',
-#                   'X6',
-#                   'X10',
-#                   ['G4', 'B4', 'R1', 'B5', 'Y2', 'B9', 'G1', 'B6', 'Y8', 'B10', 'B8', 'R3', 'G8', 'Y7', 'G6', 'R9', 'Y3', 'Y1', 'R8', 'G3', 'G10', 'G2', 'B7', 'R5', 'R10', 'Y5', 'R2', 'G5', 'G7', 'R7', 'R11', 'Y11', 'Y9', 'Y10', 'R4', 'B11', 'B1', 'Y4', 'Y6', 'B2', 'R6', 'G9', 'G11', 'B3'],
+#game = usurperGame("Lisa", "Aiden", 'AI', 'AI','full','full','overall_pair_averages_reverse','points',
+#                   'X2',
+#                   'X3',
+#                   ['Y3', 'G1', 'B5', 'R5', 'R2', 'G6', 'B8', 'Y9', 'Y1', 'G4', 'G10', 'Y6', 'R4', 'B4', 'R6', 'B2', 'Y11', 'B9', 'B10', 'G11', 'B11', 'G7', 'R7', 'Y2', 'G2', 'Y5', 'R1', 'R8', 'G8', 'G5', 'B3', 'G9', 'G3', 'B7', 'B6', 'Y10', 'R10', 'R9', 'Y8', 'Y7', 'Y4', 'R3', 'R11', 'B1'],
 #                   0)
 #game.mainLoop()

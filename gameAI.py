@@ -1106,7 +1106,7 @@ class gameAI:
                             test_grid, opponent_grid, player_bonus, opponent_fill_dict, opponent_fill_card, replacement_dict)
                         if player_score_x > best:
                             best = player_score_x
-                            card_placement_x = x
+                            card_selection_x = x
                     return card_selection_x
             elif self.draft_mode != 'random':
                 if self.draft_mode == 'points':
