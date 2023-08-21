@@ -1091,7 +1091,7 @@ class gameAI:
                     card_selection_x = -1
                     best = 0
                     for x in range(len(player_hand)):
-                        if self.g7_plan['decision'] == 'y' and self.last_order[0].name == 'Horn Blower' and player_hand[x].name == 'Horn Blower':
+                        if self.g7_plan['decision'] == 'y' and len(self.last_order) > 0 and self.last_order[0].name == 'Horn Blower' and player_hand[x].name == 'Horn Blower':
                             continue
                         test_grid, _ = grid_deep_copy(self.last_plan)
                         flat_test_grid = [
