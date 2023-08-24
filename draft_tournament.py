@@ -27,7 +27,7 @@ starters = [0]*45+[1]*45
 
 competitor_data = pd.DataFrame(columns=['wins', 'ties', 'losses', 'first', 'second']+list(competitors.keys())+bonus_id_list+card_id_list,
                                index=list(competitors.keys()),
-                               data=np.zeros((10, 69)))
+                               data=np.zeros((11, 70)))
 
 game_data = pd.DataFrame(columns=['p1', 'p2', 'winner', 'loser', 'first', 'second', 'p1score', 'p2score',
                          'p1bonus', 'p2bonus']+['p1_draft_'+str(i) for i in range(1, 10)]+['p2_draft_'+str(i) for i in range(1, 10)])
