@@ -8,7 +8,8 @@ competitors = {
     "Aiden": ['full', 'points'],
     "Andrew": ['full', 'points_reverse'],
     "Keiran": ['full', 'single_card_averages'],
-    "Spencer": ['full', 'opp_pair_averages'],
+    "Spencer": ['full', 'pair_averages'],
+    "Doni": ['full', 'opp_pair_averages'],
     "Lilly": ['full', 'overall_pair_averages'],
     "Lisa": ['full', 'overall_pair_averages_reverse'],
     "Corwin": ['full', 'wifes_boyfriend'],
@@ -88,6 +89,8 @@ for comp_combo in itertools.combinations(list(competitors.keys()), 2):
             print(comp_combo_list)
             print(s_index)
             s_index += 1
+    game_data.to_csv('game_data'+comp_combo[0]+comp_combo[1]+'.csv')
+    competitor_data.to_csv('competitor_data'+comp_combo[0]+comp_combo[1]+'.csv')
 
 game_data.to_csv('game_data.csv')
 competitor_data.to_csv('competitor_data.csv')
